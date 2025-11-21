@@ -1,7 +1,16 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <fstream>
 using namespace std;
+
+/* ---- Functions Declare ----*/
+
+string lowerCase(string str);
+
+/* ---- Functions Declare ----*/
+
+/* ---- Classes ----*/
 
 class Library{
 	private : 
@@ -10,30 +19,34 @@ class Library{
 		string author;
 		string quantity;
 		string page;
+		string level;
+		string zone;
 	public :
-		vector<Library> librarian;
-		Library(string id, string title, string author, string quantity, string page){
+		vector<Library> bookHolder;
+		Library(string id, string title, string author, string quantity, string page, string level, string zone){
 			this->id = id;
 			this->title = title;
 			this->author = author;
 			this->quantity = quantity;
 			this->page = page;
+			this->level = level;
+			this->zone = zone;
 		}
 
-		int getQuantity() {return stoi(quantity);}
+		int getQuantity(){return stoi(quantity);}
 		
-		void Read();
+		void ReadFile();
 		void View();
 		void Write();
 		void Find(const string str, const int choice);
 };
-class Borrowable: public Library{
+class Borrowable: public Library {
 	private : 
 		string start;
 		string end;
 		string costumer;
 	public :
-		Borrowable(string id, string title, string author, string quantity, string page, string start, string end, string costumer) :Library(id, title, author, quantity, page){
+		Borrowable(string id, string title, string author, string quantity, string level, string zone, string page, string start, string end, string costumer) :Library(id, title, author, quantity, page, level, zone) {
 			this->start = start;
 			this->end = end;
 			this->costumer = costumer;
@@ -41,13 +54,17 @@ class Borrowable: public Library{
 		
 };
 
-void Library::Read(){
-	string buffer, title, author, id, quantity, page;
-	librarian.clear();
+/* ---- Classes ----*/
+
+/* ---- Classes' Functions ----*/
+
+void Library::ReadFile() {
+	string buffer, id, title, author, quantity, page, level, zone;
+	bookHolder.clear();
 	
 	ifstream file("library.txt");
 
-	while (getline(file, buffer)){
+	while (getline(file, buffer)) {
 		getline(file, buffer, '|');
 		id = buffer;
 		getline(file, buffer, '|');
@@ -58,34 +75,37 @@ void Library::Read(){
 		quantity = buffer;
 		getline(file, buffer, '|');
 		page = buffer;
-		Library lib(id, title, author, quantity, page);
-		librarian.push_back(lib);
+		getline(file, buffer, '|');
+		level = buffer;
+		getline(file, buffer, '|');
+		zone = buffer;
+		Library lib(id, title, author, quantity, page, level, zone);
+		bookHolder.push_back(lib);
 	}
 
 	file.close();
 }
 
-void Library::View(){
-	Read();
+void Library::View() {
+	ReadFile();
 	cout << "Here are the book titles\' list\n";
 	cout << "---------------\n";
 
-	for (vector<Library>::size_type i = 0; i < librarian.size(); i++){
-		cout << "\"" << librarian.at(i).title << "\" by " << librarian.at(i).author
+	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
+		cout << "\"" << bookHolder.at(i).title << "\" by " << bookHolder.at(i).author
 		<< "with" << quantity << "books.\n";
 	}
 
 	cout << "---------------\n";
 }
 
-void Library::Write(){
-	Read();
+void Library::Write() {
 	ofstream output("libraryCopy.txt");
 
-	for (vector<Library>::size_type i = 0; i < librarian.size(); i++) {
-		output << librarian.at(i).id << "|" << librarian.at(i).title << "|" 
-		<< librarian.at(i).author << "|" << librarian.at(i).quantity << "|"
-		<< librarian.at(i).page << "|\n";
+	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
+		output << bookHolder.at(i).id << "|" << bookHolder.at(i).title << "|" 
+		<< bookHolder.at(i).author << "|" << bookHolder.at(i).quantity << "|"
+		<< bookHolder.at(i).page << "|\n";
 	}
 
 	output.close();
@@ -93,8 +113,8 @@ void Library::Write(){
 }
 
 void Library::Find(const string str, const int choice) {
-	string buffer, id, title, author, quantity, page;
-	librarian.clear();
+	string buffer, id, title, author, quantity, page, level, zone;
+	bookHolder.clear();
 
 	ifstream file("library.txt");
 
@@ -109,16 +129,20 @@ void Library::Find(const string str, const int choice) {
 		quantity = buffer;
 		getline(file, buffer, '|');
 		page = buffer;
-		Library lib(id, title, author, quantity, page);
+		getline(file, buffer, '|');
+		level = buffer;
+		getline(file, buffer, '|');
+		zone = buffer;
+		Library lib(id, title, author, quantity, page, level, zone);
 
 		if (choice == 1) {
-			if (lib.title == str) {
-				librarian.push_back(lib);
+			if (lowerCase(lib.title).find(lowerCase(str)) != string::npos) {
+				bookHolder.push_back(lib);
 			}
 		}
 		else if (choice == 2) {
-			if (lib.author == str) {
-				librarian.push_back(lib);
+			if (lowerCase(lib.author).find(lowerCase(str)) != string::npos) {
+				bookHolder.push_back(lib);
 			}
 		}
 	}
@@ -126,34 +150,66 @@ void Library::Find(const string str, const int choice) {
 	file.close();
 
 	int sum = 0;
-	for (vector<Library>::size_type i = 0; i < librarian.size(); i++) {
-		sum += stoi(librarian.at(i).quantity);
+	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
+		sum += stoi(bookHolder.at(i).quantity);
 	}
 
 	cout << "There are " << sum << " books match with your choice\n";
 	if (sum != 0) {
 		cout << "They are: \n";
-		for (vector<Library>::size_type i = 0; i < librarian.size(); i++){
-			cout << "\"" << librarian.at(i).title << "\" by " << librarian.at(i).author
-			<< " with " << quantity << " books.\n";
+		for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
+			cout << "\"" << bookHolder.at(i).title << "\" by " << bookHolder.at(i).author
+			<< " with " << bookHolder.at(i).quantity << " books in level: "
+			<< bookHolder.at(i).level << " and zone: " << bookHolder.at(i).zone<< "\n";
 		}
 	}
-
-	
 }
-int main(){
 
-    int status = 1;
+
+/* ---- Classes' Functions ----*/
+
+/* ---- Functions Define ----*/
+
+string lowerCase(string str) {
+	string result = "";
+	for (char i : str) {
+		if ((65 <= (int) i) && ((int) i <= 90)) {
+            i += 32;
+        }
+		result += i;
+	}
+	return result;
+}
+
+/* ---- Functions Define ----*/
+/* ----- Feature ----*/
+
+
+int main() {
+
+	int passcode;
+    bool status = true;
 	int quantitiesSum = 0;
     int choice;
     int searchChoice;
 	string searchString;
-    string title, author, id, quantity, page;
-    Library* lib = new Library(id, title, author, quantity, page);
-    
-    
-    
-    while (status){
+    string id, title, author, quantity, page, level, zone;
+    Library* librarian = new Library(id, title, author, quantity, page, level, zone);
+    while(status){
+		cout << "Enter passcode to start the programme:";
+		cin >> passcode;
+		if (passcode == 1) {
+			status = false;
+			cout << "Welcome to library\n";
+			librarian->ReadFile();
+		}
+		else {
+			cout << "Wrong passcode, please try again\n";
+		}
+	}
+	
+	status = true;
+    while (status) {
 
 		cout << "\n";
         cout << "---------- Library ----------\n";
@@ -171,78 +227,82 @@ int main(){
         cin >> choice;
 		cout << "\n";
 
-        switch(choice){
-            case 1:{
-                lib->Read();
+        switch(choice) {
+            case 1: {
+                librarian->ReadFile();
 
-				for (vector<Library>::size_type i = 0; i < lib->librarian.size(); i++) {
-					quantitiesSum += lib->librarian.at(i).getQuantity();
+				for (vector<Library>::size_type i = 0; i < librarian->bookHolder.size(); i++) {
+					quantitiesSum += librarian->bookHolder.at(i).getQuantity();
 				}
 
-                cout << "There are " << lib->librarian.size() << " book titles & " 
+                cout << "There are " << librarian->bookHolder.size() << " book titles & " 
 				<< quantitiesSum << " books in total\n"; 
 				quantitiesSum = 0;
                 break;
 			}
 
-            case 2:{
-				lib->Write();
+            case 2: {
+				librarian->Write();
                 break;
 			}
 
-            case 3:{
-                lib->View();
+            case 3: {
+                librarian->View();
                 break;
 			}
 
-            case 4:{
-            	cout << "--------------------------------------------\n";
-                cout << "|Do you want to search by Title or Author  |\n";
-                cout << "|1. Title                                  |\n";
-                cout << "|2. Author                                 |\n";
-                cout << "--------------------------------------------\n";
-                cout << "Enter your choice: "; cin >> searchChoice;
-
+            case 4: {
+				while(1) {
+					cout << "--------------------------------------------\n";
+					cout << "|Do you want to search by Title or Author  |\n";
+					cout << "|1. Title                                  |\n";
+					cout << "|2. Author                                 |\n";
+					cout << "--------------------------------------------\n";
+					cout << "Enter your choice: "; cin >> searchChoice;
+					if (searchChoice == 1 || searchChoice == 2) {
+						break;
+					}
+				}
 				if(searchChoice == 1){
                 	cout << "Title you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
 					cout << "\n";
-					lib->Find(searchString, searchChoice);
+					librarian->Find(searchString, searchChoice);
 				} 
 				else if (searchChoice == 2){
                 	cout << "Author you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
 					cout << "\n";
-					lib->Find(searchString, searchChoice);
+					librarian->Find(searchString, searchChoice);
 				}
                 break;
 			}
 
-            case 5:{
+            case 5: {
                 cout << "5\n";
                 break;
 			}
 
-            case 6:{
+            case 6: {
                 cout << "6\n";
                 break;
 			}
 
-            case 7:{
+            case 7: {
                 cout << "7\n";
                 break;
 			}
 
-            case 8:{
+            case 8: {
                 cout << "8\n";
                 break;
 			}
 
-            case 9:{
+            case 9: {
                 cout << "Thanks for comming have a good day !\n";
-                status = 0;
+                status = false;
                 break;
 			}
 

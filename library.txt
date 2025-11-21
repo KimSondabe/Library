@@ -1,4 +1,4 @@
 *Blank*
-8363|Algorithms|Sarah Lee|8|512|
-6964|Data Structures|Michael Chan|17|574|
-2879|Data Structures|Sarah Lee|18|304|
+0001|Algorithms|Sarah Lee|8|512|1|A|
+0002|Data Structures|Michael Chan|17|574|1|B|
+0003|Data Structures|Sarah Lee|18|304|1|B|
