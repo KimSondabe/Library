@@ -1,0 +1,3 @@
+0001|Algorithms|Sarah Lee|8|512|
+0002|Data Structures|Michael Chan|17|574|
+0003|Data Structures|Sarah Lee|18|304|
