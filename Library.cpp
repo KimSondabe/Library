@@ -42,6 +42,7 @@ class Library{
 		void Find(const string str, const int choice);
 		void Issue();
 		void Return();
+		void Add();
 };
 class Borrowable: public Library {
 	private : 
@@ -203,6 +204,63 @@ void Library::Return(){
 	cout << "Your book didn't exist'\n";
 	}
 }
+void Library::Add(){
+	string title, author, zone, id, quantity, page, level;
+	int i, q, p, l;
+	string z;
+	while(true){
+	cout << "Please enter book's ID: ";
+	cin >> i;
+	if(i > 9999 || i < 0){
+		cout << "Please enter again\n";
+		} else {
+		break;
+		}
+	}
+	cout << "\n";
+	cout << "Please enter book's Title: ";
+	cin.ignore();
+	getline(cin, title);
+	cout << "\n";
+	cout << "Please enter book's Author: ";
+	cin.ignore();
+	getline(cin, author);
+	cout << "\n";
+	while(true){
+	cout << "Please enter book's Quantity: ";
+	cin >> q;
+	if(i > 999 || i < 0){
+		cout << "Please enter again\n";
+		} else {
+		break;
+		}
+	}
+	cout << "\n";
+	while(true){
+	cout << "Please enter book's Page: ";
+	cin >> p;
+	if(i > 9999 || i < 0){
+		cout << "Please enter again\n";
+		} else {
+		break;
+		}
+	}
+	cout << "\n";
+	cout << "Please enter book's Zone: ";
+	cin.ignore();
+	getline(cin, z);
+	cout << "\n";
+	while(true){
+	cout << "Please enter book's Level: ";
+	cin >> l;
+	if(i > 10 || i < 0){
+		cout << "Please enter again\n";
+		} else {
+		break;
+		}
+	}
+	cout << "\n";
+}
 
 
 /* ---- Classes' Functions ----*/
@@ -215,6 +273,16 @@ string lowerCase(string str) {
 		if ((65 <= (int) i) && ((int) i <= 90)) {
             i += 32;
         }
+		result += i;
+	}
+	return result;
+}
+string uperCase(string str){
+	string result ="";
+	for(char i : str){
+		if((97 <= (int)i) && ((int)i <= 122)){
+			i -= 32;
+		}
 		result += i;
 	}
 	return result;
@@ -321,12 +389,64 @@ int main() {
 			}
 
             case 5: {
-                cout << "5\n";
+                while(1) {
+					cout << "-------------------------------------------------\n";
+					cout << "|Do you want to issue a book by Title or Author  |\n";
+					cout << "|1. Title                                        |\n";
+					cout << "|2. Author                                       |\n";
+					cout << "-------------------------------------------------\n";
+					cout << "Enter your choice: "; cin >> searchChoice;
+					if (searchChoice == 1 || searchChoice == 2) {
+						break;
+					}
+				}
+				if(searchChoice == 1){
+                	cout << "Title you want to search for: ";
+					cin.ignore();
+					getline(cin, searchString);
+					cout << "\n";
+					librarian->Find(searchString, searchChoice);
+				} 
+				else if (searchChoice == 2){
+                	cout << "Author you want to search for: ";
+					cin.ignore();
+					getline(cin, searchString);
+					cout << "\n";
+					librarian->Find(searchString, searchChoice);
+				}
+				librarian->Issue();
+				searchChoice = 0;
                 break;
 			}
 
             case 6: {
-                cout << "6\n";
+                while(1) {
+					cout << "-------------------------------------------------\n";
+					cout << "|Do you want to issue a book by Title or Author  |\n";
+					cout << "|1. Title                                        |\n";
+					cout << "|2. Author                                       |\n";
+					cout << "-------------------------------------------------\n";
+					cout << "Enter your choice: "; cin >> searchChoice;
+					if (searchChoice == 1 || searchChoice == 2) {
+						break;
+					}
+				}
+				if(searchChoice == 1){
+                	cout << "Title you want to search for: ";
+					cin.ignore();
+					getline(cin, searchString);
+					cout << "\n";
+					librarian->Find(searchString, searchChoice);
+				} 
+				else if (searchChoice == 2){
+                	cout << "Author you want to search for: ";
+					cin.ignore();
+					getline(cin, searchString);
+					cout << "\n";
+					librarian->Find(searchString, searchChoice);
+				}
+				librarian->Return();
+				searchChoice = 0;
                 break;
 			}
 
@@ -336,7 +456,7 @@ int main() {
 			}
 
             case 8: {
-                cout << "8\n";
+                librarian->Add();
                 break;
 			}
 
