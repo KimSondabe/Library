@@ -205,9 +205,9 @@ void Library::Return(){
 	}
 }
 void Library::Add(){
-	string title, author, zone, id, quantity, page, level;
+	string title, author, id, quantity, page, level;
+	char z;
 	int i, q, p, l;
-	string z;
 	while(true){
 	cout << "Please enter book's ID: ";
 	cin >> i;
@@ -217,49 +217,61 @@ void Library::Add(){
 		break;
 		}
 	}
+	if(i > 0 || i < 10){
+		id = "000" + to_string(i);
+	} else if(i >= 10 ||i < 100){
+		id = "00" + to_string(i);
+	} else if(i >= 100 || i < 1000){
+		id = "0" + to_string(i);
+	} else if( i >= 1000 || i < 10000){
+		id = to_string(i);
+	}
 	cout << "\n";
 	cout << "Please enter book's Title: ";
 	cin.ignore();
 	getline(cin, title);
-	cout << "\n";
 	cout << "Please enter book's Author: ";
 	cin.ignore();
 	getline(cin, author);
-	cout << "\n";
+	//cout << "\n";
 	while(true){
 	cout << "Please enter book's Quantity: ";
 	cin >> q;
-	if(i > 999 || i < 0){
+	if(q > 9999 || q < 0){
 		cout << "Please enter again\n";
 		} else {
 		break;
 		}
 	}
-	cout << "\n";
+	quantity = to_string(q);
 	while(true){
 	cout << "Please enter book's Page: ";
 	cin >> p;
-	if(i > 9999 || i < 0){
+	if(p > 9999 || p < 0){
 		cout << "Please enter again\n";
 		} else {
 		break;
 		}
 	}
-	cout << "\n";
+	page = to_string(p);
+	//cout << "\n";
 	cout << "Please enter book's Zone: ";
-	cin.ignore();
-	getline(cin, z);
-	cout << "\n";
+	cin >> z;
+	zone = toupper(z);
+	//cout << "\n";
 	while(true){
 	cout << "Please enter book's Level: ";
 	cin >> l;
-	if(i > 10 || i < 0){
+	if( l> 10 || l < 0){
 		cout << "Please enter again\n";
 		} else {
 		break;
 		}
 	}
-	cout << "\n";
+	level = to_string(l);
+	//cout << "\n";
+	Library lib(id, title, author, quantity, page, level, zone);
+	bookHolder.push_back(lib);
 }
 
 
@@ -277,17 +289,6 @@ string lowerCase(string str) {
 	}
 	return result;
 }
-string uperCase(string str){
-	string result ="";
-	for(char i : str){
-		if((97 <= (int)i) && ((int)i <= 122)){
-			i -= 32;
-		}
-		result += i;
-	}
-	return result;
-}
-
 /* ---- Functions Define ----*/
 /* ----- Feature ----*/
 
@@ -302,6 +303,11 @@ int main() {
 	string searchString;
     string id, title, author, quantity, page, level, zone;
     Library* librarian = new Library(id, title, author, quantity, page, level, zone);
+
+	int day = 25;
+	int month = 11;
+	int year = 2025;
+
     while(status){
 		cout << "----------------LIBRARY---------------\n";
 		cout << "Enter passcode to start the programme: ";
@@ -309,6 +315,7 @@ int main() {
 		if (passcode == 1) {
 			status = false;
 			cout << "------Welcome to library------\n";
+			cout << "Hanoi, " << day << "\"" << month << "\"" << year << "\n";
 			librarian->ReadFile();
 		}
 		else {
@@ -329,7 +336,9 @@ int main() {
         cout << "|6. Return a book           |\n"; // Tra sach (Undone)
         cout << "|7. Sorting                 |\n"; // :)?
         cout << "|8. Add a new book          |\n"; // Undone
-        cout << "|9. Exit                    |\n"; // Done
+		cout << "|9. Reset                   |\n"; // Undone
+		cout << "|10. Date                   |\n"; // Undone
+        cout << "|11. Exit                   |\n"; // Done
         cout << "-----------------------------\n";
         cout << "Enter your choice: ";
         cin >> choice;
@@ -459,8 +468,15 @@ int main() {
                 librarian->Add();
                 break;
 			}
-
-            case 9: {
+			case 9: {
+				librarian->ReadFile();
+				cout << "Reset sucessfully!\n";
+				break;
+			}
+			case 10: {
+				break;
+			}
+            case 11: {
                 cout << "Thanks for comming have a good day !\n";
                 status = false;
                 break;
