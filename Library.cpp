@@ -7,6 +7,20 @@ using namespace std;
 /* ---- Functions Declare ----*/
 
 string lowerCase(string str);
+string normalizeZone(string zone);
+string capitalizeWords(string s);
+string normalizeLevel(string level);
+string normalizeID(string id);
+
+bool checkID(const string &id);
+bool checkText(const string &s);
+bool checkLevel(const string &s);
+bool checkZone(const string &s);
+bool isNumber(const string &s);
+bool checkPage(const string &s);
+bool checkQuantity(const string &s);
+
+
 
 /* ---- Functions Declare ----*/
 
@@ -42,6 +56,7 @@ class Library{
 		void Find(const string str, const int choice);
 		void Issue();
 		void Return();
+		void Add();
 };
 class Borrowable: public Library {
 	private : 
@@ -95,7 +110,7 @@ void Library::View() {
 
 	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
 		cout << "\"" << bookHolder.at(i).title << "\" by " << bookHolder.at(i).author
-		<< "with" << quantity << "books.\n";
+		<< " with " << bookHolder.at(i).quantity << " books.\n";
 	}
 
 	cout << "---------------\n";
@@ -113,7 +128,6 @@ void Library::Write() {
 	output.close();
 	cout << "Copied to \"libraryCopy.txt\"\n";
 }
-
 void Library::Find(const string str, const int choice) {
 	find.clear();
 	if (choice == 1) {
@@ -203,7 +217,97 @@ void Library::Return(){
 	cout << "Your book didn't exist'\n";
 	}
 }
-
+void Library::Add() {
+    string id, title, author, level, zone, quantity, page;
+	int check, index;
+	int sum = 0;
+    while (true) {
+        cout << "Enter ID (maximum 4 digits): ";
+        cin >> id;
+        if (isNumber(id)) {
+            while (id.size() < 4) id = "0" + id;
+        }
+        if (checkID(id)) break;
+        cout << "Invalid ID please try again.\n";
+    }
+    cin.ignore();
+    while (true) {
+        cout << "Enter Book's Title: ";
+        getline(cin, title);
+        if (checkText(title)) {
+            title = capitalizeWords(title);
+            break;
+        }
+        cout << ".\n";
+    }
+    while (true) {
+        cout << "Enter Book's Author: ";
+        getline(cin, author);
+        if (checkText(author)) {
+            author = capitalizeWords(author);
+            break;
+        }
+        cout << "Unknown Author, please try again.\n";
+    }
+	for(int i = 0; i < bookHolder.size(); i++){
+		if((title == bookHolder.at(i).title) & (author == bookHolder.at(i).author)){
+			check = 0;
+			index = i;
+		}
+	}
+	if(check == 1){
+		while (true) {
+			cout << "Enter Book's Level (1-10): ";
+			cin >> level;
+			if (checkLevel(level)) break;
+			cout << "Invalid Level, please try again\n";
+		}
+		while (true) {
+			cout << "Enter Book's Zone (A-Z): ";
+			cin >> zone;
+			if (checkZone(zone)) {
+				zone[0] = toupper(zone[0]);
+				break;
+			}
+			cout << "Invalid book's zone, please try again.\n";
+		}
+		while (true) {
+			cout << "Enter Book's Quantity (<999): ";
+			cin >> quantity;
+			if (checkQuantity(quantity)) break;
+			cout << "Invalid book's quantity, please try again.\n";
+		}
+		while (true) {
+			cout << "Enter Book's Page (9999>x>0): ";
+			cin >> page;
+			if (checkPage(page)) break;
+			cout << "Invalid book's page, please try again.\n";
+		}
+		cout << "\n--- Adding Book successfully ---\n";
+		cout << "ID: " << id << endl;
+		cout << "Title: " << title << endl;
+		cout << "Author: " << author << endl;
+		cout << "Level: " << level << endl;
+		cout << "Zone: " << zone << endl;
+		cout << "Quantity: " << quantity << endl;
+		cout << "Page: " << page << endl;
+	}
+	if(check == 0){
+		while (true) {
+			cout << "Add Book's Quantity  (<999): ";
+			cin >> quantity;
+			if (checkQuantity(quantity)){
+				sum = stoi(bookHolder.at(index).quantity) + stoi(quantity);
+				bookHolder.at(index).quantity = to_string(sum);
+				break;
+			}
+			cout << "Invalid book's quantity, please try again.\n";
+		}
+		cout << "Adding book's quantity successfully!\n";
+	}
+}
+//xem quyển sách có sẵn không thêm số lượng sách cũ
+// xem lại hàm kiểm tra zone và level
 
 /* ---- Classes' Functions ----*/
 
@@ -219,6 +323,86 @@ string lowerCase(string str) {
 	}
 	return result;
 }
+
+/*----Normalize variables-----*/
+string normalizeZone(string zone) {
+    if (zone.size() != 1) return "unknown";
+    if (!isalpha(zone[0])) return "unknown";
+    char c = toupper(zone[0]);
+    if (c < 'A' || c > 'Z') return "unknown";
+    return string(1, c);
+}
+string normalizeLevel(string level) {
+    for (char c : level)
+        if (!isdigit(c)) return "unknown";
+    int x = stoi(level);
+    return (1 <= x && x <= 10) ? level : "unknown";
+}
+string capitalizeWords(string s) {
+    if (s.size() == 0) return "unknown";
+    bool newWord = true;
+    for (int i = 0; i < (int)s.size(); i++) {
+        if (isspace(s[i])) {
+            newWord = true;
+        } else {
+            if (newWord && isalpha(s[i])) {
+                s[i] = toupper(s[i]);
+                newWord = false;
+            } else {
+                s[i] = tolower(s[i]);
+                newWord = false;
+            }
+        }
+    }
+    return s;
+}
+string normalizeID(string id) {
+    for (char c : id) {
+        if (!isdigit(c)) return "unknown";
+    }
+    int num = stoi(id);
+    if (num < 0 || num > 9999) return "unknown";
+    string res = to_string(num);
+    while (res.length() < 4) res = "0" + res;
+    return res;
+}
+/*----Check variables----*/
+bool checkID(const string &id) {
+    if (id.size() != 4) return false;
+    for (char c : id) 
+        if (!isdigit(c)) return false;
+    return true;
+}
+bool checkText(const string &s) {
+    return !s.empty();
+}
+bool checkLevel(const string &s) {
+    if (s.empty()) return false;
+    for (char c : s) if (!isdigit(c)) return false;
+    int lv = stoi(s);
+    return lv >= 1 && lv <= 10;
+}
+bool checkZone(const string &s) {
+    return (s.size() == 1 && isalpha(s[0]) && toupper(s[0]) >= 'A' && toupper(s[0]) <= 'Z');
+}
+bool isNumber(const string &s) {
+    if (s.empty()) return false;
+    for (char c : s) if (!isdigit(c)) return false;
+    return true;
+}
+bool checkPage(const string &s) {
+    if (!isNumber(s)) return false;
+    int p = stoi(s);
+    return p > 0;
+}
+bool checkQuantity(const string &s) {
+    if (!isNumber(s)) return false;
+    int q = stoi(s);
+    return q > 0 && q < 999;
+}
+
+
+
 
 /* ---- Functions Define ----*/
 /* ----- Feature ----*/
@@ -256,8 +440,8 @@ int main() {
         cout << "|2. Store into other file   |\n"; // Done
         cout << "|3. View all books          |\n"; // Done
         cout << "|4. Find book               |\n"; // Done
-        cout << "|5. Issue a book            |\n"; // Lay x quyen sach (Undone)
-        cout << "|6. Return a book           |\n"; // Tra sach (Undone)
+        cout << "|5. Issue a book            |\n"; // Done
+        cout << "|6. Return a book           |\n"; // Done
         cout << "|7. Sorting                 |\n"; // :)?
         cout << "|8. Add a new book          |\n"; // Undone
         cout << "|9. Exit                    |\n"; // Done
@@ -387,7 +571,7 @@ int main() {
 			}
 
             case 8: {
-                cout << "8\n";
+                librarian->Add();
                 break;
 			}
 
@@ -402,9 +586,5 @@ int main() {
 			}
         }
     }
-    
-
-
-
     return 0;
 }
