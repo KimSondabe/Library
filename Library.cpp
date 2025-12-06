@@ -168,8 +168,11 @@ void Library::Issue(){
 	}
 	cout << "-------------------------------------------------\n";
 	if(sum != 0){
-		cout << "Please enter ID of book you want to borrow: ";
+		while(true){
+		cout << "Please enter ID of book you want to return: ";
 		cin >> id_buffer;
+		if(isNumber(id_buffer)) break;
+		}
 		for(vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
 			if(id_buffer == bookHolder.at(i).id){
 				cout << "Please enter amounts of book you want to borow ";
@@ -197,8 +200,11 @@ void Library::Return(){
 	}
 	cout << "-------------------------------------------------\n";
 	if(sum != 0){
+		while(true){
 		cout << "Please enter ID of book you want to return: ";
 		cin >> id_buffer;
+		if(isNumber(id_buffer)) break;
+		}
 		for(vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
 			if(id_buffer == bookHolder.at(i).id){
 				cout << "Please enter amounts of book you want to return ";
@@ -487,22 +493,33 @@ int main() {
 					}
 				}
 				if(searchChoice == 1){
+					while(true){
                 	cout << "Title you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
 				} 
 				else if (searchChoice == 2){
+                	while(true){
                 	cout << "Author you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
+				break;	
 				}
-                break;
 			}
-
             case 5: {
                 while(1) {
 					cout << "-------------------------------------------------\n";
@@ -516,18 +533,30 @@ int main() {
 					}
 				}
 				if(searchChoice == 1){
+                	while(true){
                 	cout << "Title you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
 				} 
 				else if (searchChoice == 2){
+                	while(true){
                 	cout << "Author you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
 				}
 				librarian->Issue();
 				searchChoice = 0;
@@ -547,18 +576,30 @@ int main() {
 					}
 				}
 				if(searchChoice == 1){
+                	while(true){
                 	cout << "Title you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
 				} 
 				else if (searchChoice == 2){
+                	while(true){
                 	cout << "Author you want to search for: ";
 					cin.ignore();
 					getline(cin, searchString);
-					cout << "\n";
-					librarian->Find(searchString, searchChoice);
+					if(checkText(searchString)){
+						cout << "\n";
+						librarian->Find(searchString, searchChoice);
+						break;
+						}
+						cout << "Please try again.\n";
+					}
 				}
 				librarian->Return();
 				searchChoice = 0;
@@ -566,7 +607,30 @@ int main() {
 			}
 
             case 7: {
-                cout << "7\n";
+                while(1) {
+					cout << "----------------------------------------------\n";
+					cout << "|Do you want to sort by ID orTitle or Author  |\n";
+					cout << "|1. ID                                        |\n";
+					cout << "|2. Title                                     |\n";
+					cout << "|3. Author                                    |\n";
+					cout << "--------------------------------------------\n";
+					cout << "Enter your choice: "; cin >> searchChoice;
+					if (searchChoice == 1 || searchChoice == 2 || searchChoice == 3) {
+						break;
+					}
+				}
+				switch(searchChoice){
+					case 1:{
+						break;
+					}
+					case 2:{
+						break;
+					}
+					case 3:{
+						break;
+					}
+				}
+				searchChoice = 0;
                 break;
 			}
 
@@ -588,3 +652,4 @@ int main() {
     }
     return 0;
 }
+
