@@ -38,6 +38,7 @@ class Library{
 	public :
 		vector<Library> bookHolder;
 		vector<Library> find;
+		vector<int> sort;
 		Library(string id, string title, string author, string quantity, string page, string level, string zone){
 			this->id = id;
 			this->title = title;
@@ -49,7 +50,7 @@ class Library{
 		}
 
 		int getQuantity(){return stoi(quantity);}
-		
+
 		void ReadFile();
 		void View();
 		void Write();
@@ -57,6 +58,7 @@ class Library{
 		void Issue();
 		void Return();
 		void Add();
+		void Sort();
 };
 class Borrowable: public Library {
 	private : 
@@ -103,7 +105,6 @@ void Library::ReadFile() {
 
 	file.close();
 }
-
 void Library::View() {
 	cout << "Here are the book titles\' list\n";
 	cout << "---------------\n";
@@ -115,7 +116,6 @@ void Library::View() {
 
 	cout << "---------------\n";
 }
-
 void Library::Write() {
 	ofstream output("libraryCopy.txt");
 
@@ -312,9 +312,8 @@ void Library::Add() {
 		cout << "Adding book's quantity successfully!\n";
 	}
 }
-//xem quyển sách có sẵn không thêm số lượng sách cũ
-// xem lại hàm kiểm tra zone và level
-
+void Library::Sort(){
+}
 /* ---- Classes' Functions ----*/
 
 /* ---- Functions Define ----*/
@@ -372,6 +371,7 @@ string normalizeID(string id) {
     while (res.length() < 4) res = "0" + res;
     return res;
 }
+
 /*----Check variables----*/
 bool checkID(const string &id) {
     if (id.size() != 4) return false;
@@ -502,8 +502,9 @@ int main() {
 						librarian->Find(searchString, searchChoice);
 						break;
 						}
-						cout << "Please try again.\n";
+					else{cout << "Please try again.\n";}
 					}
+					break;
 				} 
 				else if (searchChoice == 2){
                 	while(true){
@@ -515,9 +516,9 @@ int main() {
 						librarian->Find(searchString, searchChoice);
 						break;
 						}
-						cout << "Please try again.\n";
+					else{cout << "Please try again.\n";}
 					}
-				break;	
+					break;	
 				}
 			}
             case 5: {
@@ -621,6 +622,7 @@ int main() {
 				}
 				switch(searchChoice){
 					case 1:{
+						librarian->Sort();
 						break;
 					}
 					case 2:{
