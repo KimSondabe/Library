@@ -49,13 +49,15 @@ class Library{
 			this->zone = zone;
 		}
 
-		int getQuantity(){return stoi(quantity);}
+		int getQuantity() { 
+			return stoi(quantity);
+		}
 
 		void ReadFile();
 		void View();
-		void Write();
+		void Write(const string file);
 		void Find(const string str, const int choice);
-		void Issue();
+		void Borrow();
 		void Return();
 		void Add();
 		void Sort();
@@ -105,6 +107,7 @@ void Library::ReadFile() {
 
 	file.close();
 }
+
 void Library::View() {
 	cout << "Here are the book titles\' list\n";
 	cout << "---------------\n";
@@ -116,9 +119,11 @@ void Library::View() {
 
 	cout << "---------------\n";
 }
-void Library::Write() {
-	ofstream output("libraryCopy.txt");
 
+void Library::Write(const string file) {
+	ofstream output(file);
+
+	output << "\n";
 	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
 		output << bookHolder.at(i).id << "|" << bookHolder.at(i).title << "|" 
 		<< bookHolder.at(i).author << "|" << bookHolder.at(i).quantity << "|"
@@ -126,8 +131,9 @@ void Library::Write() {
 	}
 
 	output.close();
-	cout << "Copied to \"libraryCopy.txt\"\n";
+	cout << "Wrote to \"" << file << "\"\n";
 }
+
 void Library::Find(const string str, const int choice) {
 	find.clear();
 	if (choice == 1) {
@@ -159,27 +165,31 @@ void Library::Find(const string str, const int choice) {
 		}
 	}
 }
-void Library::Issue(){
+
+void Library::Borrow(){
 	int amount;
 	int sum = 0;
 	string id_buffer;
-	for(vector<Library>::size_type i = 0; i < find.size() ;i++){
+	for (vector<Library>::size_type i = 0; i < find.size(); i++) {
 		sum += stoi(find.at(i).quantity);
 	}
 	cout << "-------------------------------------------------\n";
-	if(sum != 0){
-		while(true){
-		cout << "Please enter ID of book you want to return: ";
-		cin >> id_buffer;
-		if(isNumber(id_buffer)) break;
+
+	if (sum != 0) {
+		while (true) {
+			cout << "Please enter ID of book you want to borrow: ";
+			cin >> id_buffer;
+			if(isNumber(id_buffer)) break;
 		}
-		for(vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
+
+		for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
 			if(id_buffer == bookHolder.at(i).id){
 				cout << "Please enter amounts of book you want to borow ";
 				cin >> amount;
-				if(amount > stoi(bookHolder.at(i).quantity)|| amount < 0){
-					cout << "Valid number\n";
-				} else {
+				if (amount > stoi(bookHolder.at(i).quantity) || amount < 0) { 
+					cout << "Invalid number\n";
+				} 
+				else {
 					amount = stoi(bookHolder.at(i).quantity) - amount;
 					bookHolder.at(i).quantity = to_string(amount);
 					
@@ -187,10 +197,13 @@ void Library::Issue(){
 				}
 			}
 		}
-	}else{
-	cout << "Your book didn't exist'\n";
+	}
+
+	else {
+		cout << "Your book didn't exist'\n";
 	}
 }
+
 void Library::Return(){
 	int amount;
 	int sum = 0;
@@ -201,21 +214,21 @@ void Library::Return(){
 	cout << "-------------------------------------------------\n";
 	if(sum != 0){
 		while(true){
-		cout << "Please enter ID of book you want to return: ";
-		cin >> id_buffer;
-		if(isNumber(id_buffer)) break;
+			cout << "Please enter ID of book you want to return: ";
+			cin >> id_buffer;
+			if(isNumber(id_buffer)) break;
 		}
 		for(vector<Library>::size_type i = 0; i < bookHolder.size(); i++){
 			if(id_buffer == bookHolder.at(i).id){
 				cout << "Please enter amounts of book you want to return ";
 				cin >> amount;
 				if(amount > stoi(bookHolder.at(i).quantity)|| amount < 0){
-					cout << "Valid number\n";
+					cout << "Invalid number\n";
 				} else {
 					amount = stoi(bookHolder.at(i).quantity) + amount;
 					bookHolder.at(i).quantity = to_string(amount);
 					
-					cout << "----Issue books successfully!----\n"; 
+					cout << "----Borrow books successfully!----\n"; 
 				}
 			}
 		}
@@ -223,6 +236,7 @@ void Library::Return(){
 	cout << "Your book didn't exist'\n";
 	}
 }
+
 void Library::Add() {
     string id, title, author, level, zone, quantity, page;
 	int check, index;
@@ -337,12 +351,14 @@ string normalizeZone(string zone) {
     if (c < 'A' || c > 'Z') return "unknown";
     return string(1, c);
 }
+
 string normalizeLevel(string level) {
     for (char c : level)
         if (!isdigit(c)) return "unknown";
     int x = stoi(level);
     return (1 <= x && x <= 10) ? level : "unknown";
 }
+
 string capitalizeWords(string s) {
     if (s.size() == 0) return "unknown";
     bool newWord = true;
@@ -361,6 +377,7 @@ string capitalizeWords(string s) {
     }
     return s;
 }
+
 string normalizeID(string id) {
     for (char c : id) {
         if (!isdigit(c)) return "unknown";
@@ -379,40 +396,41 @@ bool checkID(const string &id) {
         if (!isdigit(c)) return false;
     return true;
 }
+
 bool checkText(const string &s) {
     return !s.empty();
 }
+
 bool checkLevel(const string &s) {
     if (s.empty()) return false;
     for (char c : s) if (!isdigit(c)) return false;
     int lv = stoi(s);
     return lv >= 1 && lv <= 10;
 }
+
 bool checkZone(const string &s) {
     return (s.size() == 1 && isalpha(s[0]) && toupper(s[0]) >= 'A' && toupper(s[0]) <= 'Z');
 }
+
 bool isNumber(const string &s) {
     if (s.empty()) return false;
     for (char c : s) if (!isdigit(c)) return false;
     return true;
 }
+
 bool checkPage(const string &s) {
     if (!isNumber(s)) return false;
     int p = stoi(s);
     return p > 0;
 }
+
 bool checkQuantity(const string &s) {
     if (!isNumber(s)) return false;
     int q = stoi(s);
     return q > 0 && q < 999;
 }
 
-
-
-
 /* ---- Functions Define ----*/
-/* ----- Feature ----*/
-
 
 int main() {
 
@@ -446,10 +464,10 @@ int main() {
         cout << "|2. Store into other file   |\n"; // Done
         cout << "|3. View all books          |\n"; // Done
         cout << "|4. Find book               |\n"; // Done
-        cout << "|5. Issue a book            |\n"; // Done
-        cout << "|6. Return a book           |\n"; // Done
-        cout << "|7. Sorting                 |\n"; // :)?
-        cout << "|8. Add a new book          |\n"; // Undone
+        cout << "|5. Borrow a book           |\n"; // In Progress
+        cout << "|6. Return a book           |\n"; // In Progress
+        cout << "|7. Sorting                 |\n"; // Undone
+        cout << "|8. Add a new book          |\n"; // In Progress
         cout << "|9. Exit                    |\n"; // Done
         cout << "-----------------------------\n";
         cout << "Enter your choice: ";
@@ -471,7 +489,7 @@ int main() {
 			}
 
             case 2: {
-				librarian->Write();
+				librarian->Write("libraryCopy.txt");
                 break;
 			}
 
@@ -521,10 +539,11 @@ int main() {
 					break;	
 				}
 			}
-            case 5: {
+            
+			case 5: {
                 while(1) {
 					cout << "-------------------------------------------------\n";
-					cout << "|Do you want to issue a book by Title or Author  |\n";
+					cout << "|Do you want to borrow a book by Title or Author  |\n";
 					cout << "|1. Title                                        |\n";
 					cout << "|2. Author                                       |\n";
 					cout << "-------------------------------------------------\n";
@@ -535,31 +554,31 @@ int main() {
 				}
 				if(searchChoice == 1){
                 	while(true){
-                	cout << "Title you want to search for: ";
-					cin.ignore();
-					getline(cin, searchString);
-					if(checkText(searchString)){
-						cout << "\n";
-						librarian->Find(searchString, searchChoice);
-						break;
+						cout << "Title you want to search for: ";
+						cin.ignore();
+						getline(cin, searchString);
+						if(checkText(searchString)){
+							cout << "\n";
+							librarian->Find(searchString, searchChoice);
+							break;
 						}
 						cout << "Please try again.\n";
 					}
 				} 
 				else if (searchChoice == 2){
                 	while(true){
-                	cout << "Author you want to search for: ";
-					cin.ignore();
-					getline(cin, searchString);
-					if(checkText(searchString)){
-						cout << "\n";
-						librarian->Find(searchString, searchChoice);
-						break;
+						cout << "Author you want to search for: ";
+						cin.ignore();
+						getline(cin, searchString);
+						if(checkText(searchString)){
+							cout << "\n";
+							librarian->Find(searchString, searchChoice);
+							break;
 						}
-						cout << "Please try again.\n";
+							cout << "Please try again.\n";
 					}
 				}
-				librarian->Issue();
+				librarian->Borrow();
 				searchChoice = 0;
                 break;
 			}
@@ -567,7 +586,7 @@ int main() {
             case 6: {
                 while(1) {
 					cout << "-------------------------------------------------\n";
-					cout << "|Do you want to issue a book by Title or Author  |\n";
+					cout << "|Do you want to return a book by Title or Author |\n";
 					cout << "|1. Title                                        |\n";
 					cout << "|2. Author                                       |\n";
 					cout << "-------------------------------------------------\n";
@@ -578,26 +597,26 @@ int main() {
 				}
 				if(searchChoice == 1){
                 	while(true){
-                	cout << "Title you want to search for: ";
-					cin.ignore();
-					getline(cin, searchString);
-					if(checkText(searchString)){
-						cout << "\n";
-						librarian->Find(searchString, searchChoice);
-						break;
+						cout << "Title you want to search for: ";
+						cin.ignore();
+						getline(cin, searchString);
+						if (checkText(searchString)) {
+							cout << "\n";
+							librarian->Find(searchString, searchChoice);
+							break;
 						}
 						cout << "Please try again.\n";
 					}
 				} 
 				else if (searchChoice == 2){
                 	while(true){
-                	cout << "Author you want to search for: ";
-					cin.ignore();
-					getline(cin, searchString);
-					if(checkText(searchString)){
-						cout << "\n";
-						librarian->Find(searchString, searchChoice);
-						break;
+						cout << "Author you want to search for: ";
+						cin.ignore();
+						getline(cin, searchString);
+						if(checkText(searchString)){
+							cout << "\n";
+							librarian->Find(searchString, searchChoice);
+							break;
 						}
 						cout << "Please try again.\n";
 					}
@@ -610,7 +629,7 @@ int main() {
             case 7: {
                 while(1) {
 					cout << "----------------------------------------------\n";
-					cout << "|Do you want to sort by ID orTitle or Author  |\n";
+					cout << "|Do you want to sort by ID or Title or Author |\n";
 					cout << "|1. ID                                        |\n";
 					cout << "|2. Title                                     |\n";
 					cout << "|3. Author                                    |\n";
@@ -642,7 +661,8 @@ int main() {
 			}
 
             case 9: {
-                cout << "Thanks for comming have a good day !\n";
+				librarian->Write("library.txt");
+				cout << "Thanks for comming have a good day !\n";
                 status = false;
                 break;
 			}
