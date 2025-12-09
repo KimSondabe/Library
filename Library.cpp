@@ -20,8 +20,6 @@ bool isNumber(const string &s);
 bool checkPage(const string &s);
 bool checkQuantity(const string &s);
 
-
-
 /* ---- Functions Declare ----*/
 
 /* ---- Classes ----*/
@@ -65,12 +63,10 @@ class Library{
 class Borrowable: public Library {
 	private : 
 		string start;
-		string end;
 		string costumer;
 	public :
-		Borrowable(string id, string title, string author, string quantity, string level, string zone, string page, string start, string end, string costumer) :Library(id, title, author, quantity, page, level, zone) {
+		Borrowable(string id, string title, string author, string quantity, string level, string zone, string page, string start, string costumer) :Library(id, title, author, quantity, page, level, zone) {
 			this->start = start;
-			this->end = end;
 			this->costumer = costumer;
 		}
 		
@@ -127,7 +123,8 @@ void Library::Write(const string file) {
 	for (vector<Library>::size_type i = 0; i < bookHolder.size(); i++) {
 		output << bookHolder.at(i).id << "|" << bookHolder.at(i).title << "|" 
 		<< bookHolder.at(i).author << "|" << bookHolder.at(i).quantity << "|"
-		<< bookHolder.at(i).page << "|\n";
+		<< bookHolder.at(i).page << "|" << bookHolder.at(i).level << "|"
+		<< bookHolder.at(i).zone << "|\n";
 	}
 
 	output.close();
@@ -304,13 +301,13 @@ void Library::Add() {
 			cout << "Invalid book's page, please try again.\n";
 		}
 		cout << "\n--- Adding Book successfully ---\n";
-		cout << "ID: " << id << endl;
-		cout << "Title: " << title << endl;
-		cout << "Author: " << author << endl;
-		cout << "Level: " << level << endl;
-		cout << "Zone: " << zone << endl;
-		cout << "Quantity: " << quantity << endl;
-		cout << "Page: " << page << endl;
+		cout << "ID: " << id << "\n";
+		cout << "Title: " << title << "\n";
+		cout << "Author: " << author << "\n";
+		cout << "Level: " << level << "\n";
+		cout << "Zone: " << zone << "\n";
+		cout << "Quantity: " << quantity << "\n";
+		cout << "Page: " << page << "\n";
 	}
 	if(check == 0){
 		while (true) {
@@ -326,8 +323,10 @@ void Library::Add() {
 		cout << "Adding book's quantity successfully!\n";
 	}
 }
+
 void Library::Sort(){
 }
+
 /* ---- Classes' Functions ----*/
 
 /* ---- Functions Define ----*/
