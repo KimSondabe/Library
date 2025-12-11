@@ -3,6 +3,13 @@
 #include <string>
 #include <fstream>
 using namespace std;
+
+typedef struct {
+	string name;
+	string customerID;
+	string borrowDay;
+} customerInfo;
+
 /* ---- Classes ----*/
 class Books{
 	private : 
@@ -14,7 +21,9 @@ class Books{
 		string level;
 		string zone;
 	public :
-		Books(string id, string title, string author, string quantity, string page, string level, string zone){
+		vector<customerInfo> customerList;
+		
+		Books(string id, string title, string author, string quantity, string page, string level, string zone, vector<customerInfo> customerList){
 			this->id = id;
 			this->title = title;
 			this->author = author;
@@ -22,8 +31,9 @@ class Books{
 			this->page = page;
 			this->level = level;
 			this->zone = zone;
+			this->customerList = customerList;
 		}
-
+		
 		/* ---- Getters ----*/
 		string getID() {
 			return id;
@@ -45,7 +55,7 @@ class Books{
 		}
 		string getZone() {
 			return zone;
-		}	
+		}
 		/* ---- Getters ----*/
 
 		/* ---- Setters ----*/
@@ -55,15 +65,8 @@ class Books{
 		}
 		/* ---- Setters ----*/
 };
-// class BorrowableBook: public Books {
-// 	private: 
-// 		string borrowDate;
-// 	public:
-// 		BorrowableBook(string id, string title, string author, string quantity, string page, string level, string zone) :Books(id, title, author, quantity, page, level, zone) {
-// 			-+7
-// 		}
-// };
 /* ---- Classes ----*/
+
 /* ---- Functions Declare ----*/
 void ReadFile(vector<Books*> &bookHolder);
 void Write(const string filename, vector<Books*> &bookHolder);
@@ -75,22 +78,63 @@ string lowerCase(string str);
 bool capitalizeWords(string &s);
 string idCounter(string prevID);
 /* ---- Functions Declare ----*/
-/* ---- Classes' Functions ----*/
+
+/* ---- Functions Definition ----*/
 
 void ReadFile(vector<Books*> &bookHolder) {
-	string buffer;
-	string bookInfo[7];
+	struct BorrowedBookInfo {
+		string bookID;
+		string borrowQuantity;
+		customerInfo info;
+	};
+	string buffer, bookInfoList[7], borrowedInfoList[5];
+	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
+	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
+	vector<BorrowedBookInfo> borrowedHolder;
+	vector<customerInfo> customerList;
+	bool borrowable = true;
 	bookHolder.clear();
+
+	// Read borrowed books file
+	ifstream file1("borrowedBooks.txt");
+	while (getline(file1, buffer)) {
+		for (int i = 0; i < 5; i++) {
+			getline(file1, buffer, '|');
+			borrowedInfoList[i] = buffer;
+		}
+		if (borrowedInfoList[0] != "") {
+			struct BorrowedBookInfo borrowedBook;
+			borrowedBook.bookID = borrowedInfoList[0];
+			borrowedBook.info.name = borrowedInfoList[1];
+			borrowedBook.info.customerID = borrowedInfoList[2];
+			borrowedBook.info.borrowDay = borrowedInfoList[3];
+			borrowedBook.borrowQuantity = borrowedInfoList[4];
+			borrowedHolder.push_back(borrowedBook);
+		}
+	}
+	file1.close();
 
 	// Read main book file
 	ifstream file("library.txt");
 	while (getline(file, buffer)) {
+		customerList.clear();
 		for (int i = 0; i < 7; i++) {
 			getline(file, buffer, '|');
-			bookInfo[i] = buffer;
+			bookInfoList[i] = buffer;
 		}
-		if (bookInfo[0] != "") {
-			Books* book = new Books(bookInfo[0], bookInfo[1], bookInfo[2], bookInfo[3], bookInfo[4], bookInfo[5], bookInfo[6]);
+		if (bookInfoList[0] != "") {
+			for (int i = 0; i < (int) borrowedHolder.size(); i++){
+				if (borrowedHolder.at(i).bookID == bookInfoList[0]) { 
+					// Minus the borrowed book(s) if someone borrowed
+					if ((stoi(bookInfoList[3]) - stoi(borrowedHolder.at(i).borrowQuantity)) > 0){
+						bookInfoList[3] = to_string(stoi(bookInfoList[3]) - stoi(borrowedHolder.at(i).borrowQuantity));
+					}
+					else bookInfoList[3] = "0";
+					// Store customer infomation into a vector
+					customerList.push_back(borrowedHolder.at(i).info);
+				}
+			}
+			Books* book = new Books(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
 			bookHolder.push_back(book);
 		}
 	}
@@ -281,15 +325,11 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 	}
 
 	id = idCounter(bookHolder.back()->getID());
-	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone);
+	vector<customerInfo> customerList;
+	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);
 	cout << "\n--- Added Book successfully ---\n";
 }
-
-
-/* ---- Classes' Functions ----*/
-
-/* ---- Functions Define ----*/
 
 string lowerCase(string str) {
 	string result = "";
@@ -338,7 +378,7 @@ string idCounter(string prevID) {
 	}
     return upComingID;
 }
-/* ---- Functions Define ----*/
+/* ---- Functions Definition ----*/
 
 int main() {
 
@@ -370,16 +410,17 @@ int main() {
     while (status) {
 		cout << "\n";
         cout << "---------- Library ----------\n";
-        cout << "|1. Number of books         |\n"; // Done
-        cout << "|2. Store into other file   |\n"; // Done
-        cout << "|3. View all books          |\n"; // Done
-        cout << "|4. Find book               |\n"; // Done
-        cout << "|5. Borrow a book           |\n"; // In Progress
-        cout << "|6. Return a book           |\n"; // In Progress
-        cout << "|7. Report book's issue     |\n"; // Undone
-        cout << "|8. Add book(s)             |\n"; // Done
-        cout << "|9. Exit                    |\n"; // Done
-        cout << "-----------------------------\n";
+        cout << "|1. Number of books           |\n"; // Done
+        cout << "|2. Store into other file     |\n"; // Done
+        cout << "|3. View all books            |\n"; // Done
+        cout << "|4. Find book                 |\n"; // Done
+        cout << "|5. Borrow a book             |\n"; // In Progress
+        cout << "|6. Return a book             |\n"; // In Progress
+		cout << "|7. Book borrowed-customer(s) |\n"; // Done
+        cout << "|8. Report book's issue       |\n"; // Done
+        cout << "|9. Add book(s)               |\n"; // Done
+        cout << "|1o. Exit                     |\n"; // Done
+        cout << "-------------------------------\n";
         cout << "Enter your choice: ";
         cin >> choice;
 		cin.ignore();
@@ -554,7 +595,36 @@ int main() {
             //     break;
 			// }
 
-            case 7: {
+			case 7: {
+				while (true) {
+					cout << "Please enter the book(s) ID you want to find (xxxx): ";
+					cin >> inputString;
+					for (char i : inputString) {
+						if (!isdigit(i)) inputString += "filler";
+					}
+					if (inputString.length() != 4) continue;
+					if (stoi(bookHolder.back()->getID()) >= stoi(inputString)) break;
+					cout << "Invalid input, please try again.\n";
+				}
+				for (int i = 0; i < (int) bookHolder.size(); i++) {
+					if (bookHolder.at(i)->getID() == inputString) {
+						if (bookHolder.at(i)->customerList.empty()) {
+							cout << "There are no customer whom borrowed this book!\n";
+						}
+						else {
+							cout << "They are:\n";
+							for (int j = 0; j < (int) bookHolder.at(i)->customerList.size(); j++) {
+								cout << "- \"" << bookHolder.at(i)->customerList.at(j).name << "\" with ID: \'" 
+								<< bookHolder.at(i)->customerList.at(j).customerID 
+								<< "\' and borrowed in " << bookHolder.at(i)->customerList.at(j).borrowDay << "\n";
+							}
+						}
+					}
+				}
+				break;
+			}
+
+            case 8: {
                 while (true) {
 					cout << "Please enter the book(s) ID you want to report (xxxx): ";
 					cin >> inputString;
@@ -585,12 +655,12 @@ int main() {
                 break;
 			}
 
-            case 8: {
+            case 9: {
                 Add(bookHolder, foundedBook);
                 break;
 			}
 
-            case 9: {
+            case 10: {
 				Write("library.txt", bookHolder);
 				for (int i = 0; i < (int) bookHolder.size(); i++) { // Clean up data
 					delete bookHolder.at(i);
