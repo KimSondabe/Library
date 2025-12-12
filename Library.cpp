@@ -694,18 +694,19 @@ int main() {
 	status = true;
     while(status) {
 		cout << "\n";
-        cout << "---------- Library ----------\n";
-        cout << "|1. Number of books           |\n"; // Done
-        cout << "|2. Store into other file     |\n"; // Done
-        cout << "|3. View all books            |\n"; // Done
-        cout << "|4. Find book                 |\n"; // Done
-        cout << "|5. Borrow book (s)           |\n"; // Done
-        cout << "|6. Return book (s)           |\n"; // In Progress
-		cout << "|7. Book borrowed-customer(s) |\n"; // Done
-        cout << "|8. Report book's issue       |\n"; // Done
-        cout << "|9. Add book(s)               |\n"; // Done
-        cout << "|1o. Exit                     |\n"; // Done
-        cout << "-------------------------------\n";
+        cout << "-------------- Library --------------\n";
+        cout << "|1. Number of books                 |\n"; // Done
+        cout << "|2. Store data into other file      |\n"; // Done
+        cout << "|3. View all books                  |\n"; // Done
+        cout << "|4. Find book                       |\n"; // Done
+		cout << "|5. View book borrower(s)           |\n"; // Done
+		cout << "|6. Borrow book (s)                 |\n"; // Done
+        cout << "|7. Return book (s)                 |\n"; // Done
+        cout << "|8. Report book's issue             |\n"; // Done
+        cout << "|9. Add book(s)                     |\n"; // Done
+		cout << "|10. Move book(s) to another place  |\n"; // To be done
+        cout << "|11. Exit                           |\n"; // Done
+        cout << "-------------------------------------\n";
         cout << "Enter your choice: ";
         cin >> choice;
 		cin.ignore();
@@ -793,16 +794,6 @@ int main() {
 			}
             
 			case 5: {
-				Borrow(bookHolder, borrowedHolder, today, inputString);
-				break;
-			}
-
-            case 6: {
-                Return(bookHolder, borrowedHolder, today, inputString);
-                break;
-			}
-
-			case 7: {
 				idInputChecker(bookHolder, inputString);
 				for (int i = 0; i < (int) bookHolder.size(); i++) {
 					if (bookHolder.at(i)->getID() == inputString) {
@@ -820,6 +811,16 @@ int main() {
 					}
 				}
 				break;
+			}
+
+			case 6: {
+				Borrow(bookHolder, borrowedHolder, today, inputString);
+				break;
+			}
+
+            case 7: {
+                Return(bookHolder, borrowedHolder, today, inputString);
+                break;
 			}
 
             case 8: {
@@ -848,7 +849,12 @@ int main() {
                 break;
 			}
 
-            case 10: {
+			case 10: {
+				cout << "This feature is under development, please wait for the next version!\n";
+				break;
+			}
+
+            case 11: {
 				Write("library.txt", bookHolder, borrowedHolder);
 				for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
 					delete bookHolder.at(i);
