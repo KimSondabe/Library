@@ -62,6 +62,9 @@ class Books{
 		string getZone() {
 			return zone;
 		}
+		int getBorrowDate() {
+			return (stoi(page) / 10 < 14) ? 14 : stoi(page) / 10;
+		}
 		/* ---- Getters ----*/
 
 		/* ---- Setters ----*/
@@ -90,6 +93,9 @@ void idInputChecker(vector<Books*> &bookHolder, string &inputString); // Check v
 bool isLeap(int year); // Check leap year
 int daysInMonth(int month, int year); // Check number of days in month
 bool dayFormatCheck(string &str); // Check if user has inserted the right dd/mm/yyyy format and normalize
+int dayCounter(string start, string end); // Count number of days between two dates
+string borrowDateCalculate(string start, int borrowDuration); // Calculate return date based on borrow date and duration
+bool customerIDchecker(string &customerID); // Check valid customer ID input
 /* ---- Functions Declare ----*/
 
 /* ---- Functions Definition ----*/
@@ -173,7 +179,7 @@ void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBoo
 	}	
 
 	output.close();
-	cout << "Wrote to \"" << filename << "\" and \"borrowedBooks.txt\"\n";
+	cout << "Wrote to \"borrowedBooks.txt\"\n";
 }
 
 void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string str, const int choice) {
@@ -213,19 +219,15 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 
 	// Checking book's title and author
 	
-    while(true) {
-        cout << "Enter Book's Title: ";
-        getline(cin, title);
-        if (capitalizeWords(title)) break;
-        cout << "Invalid input, please try again!\n";
-    }
+	cout << "Enter Book's Title: ";
+    do {
+		getline(cin, title);
+	} while(!capitalizeWords(title));
 
-    while(true) {
-        cout << "Enter Book's Author: ";
-        getline(cin, author);
-        if (capitalizeWords(author)) break;
-        cout << "Invalid input, please try again!\n";
-    }
+	cout << "Enter Book's Author: ";
+    do {
+		getline(cin, author);
+	} while(!capitalizeWords(author));
 
 	Find(bookHolder, foundedBook, title, author); // Check for same book title & author
 
@@ -272,7 +274,11 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 		cout << "Invalid input, please try again.\n";
 	}
 
-	id = idCounter(bookHolder.back()->getID());
+	if (bookHolder.empty()) {
+		id = "0001";
+	} else {
+		id = idCounter(bookHolder.back()->getID());
+	}
 	vector<customerInfo> customerList;
 	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);
@@ -282,7 +288,6 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
 	idInputChecker(bookHolder, inputString);
 	string buffer;
-	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
 	vector<string> customerIDlist;
     
 	// Find the book in bookHolder
@@ -292,15 +297,28 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 				cout << "Sorry, this book is out of stock!\n";
 				return;
 			}
+			// Get customer info
 			customerInfo newCustomer;
-			cout << "Enter your name: ";
+			cout << "Please provide your information to borrow the book.\n";
 			cin.ignore();
-			getline(cin, buffer);
+			cout << "Enter your name: ";
+			do {
+				getline(cin, buffer);
+			} while(!capitalizeWords(buffer));
 			newCustomer.name = buffer;
 			cout << "Enter your ID: ";
-			getline(cin, buffer);
+			do {
+				getline(cin, buffer);
+			} while (!customerIDchecker(buffer));
 			newCustomer.customerID = buffer;
 			newCustomer.borrowDay = today;
+			// Check if customer has already borrowed this book
+			for (int j = 0; j < (int) bookHolder.at(i)->customerList.size(); j++) {
+				if (bookHolder.at(i)->customerList.at(j).name == newCustomer.name && bookHolder.at(i)->customerList.at(j).customerID == newCustomer.customerID) {
+					cout << "You have already borrowed this book!\n";
+					return;
+				}
+			}
 			bookHolder.at(i)->customerList.push_back(newCustomer);
 			// Ask for quantity to borrow
 			do {
@@ -320,7 +338,7 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 			borrowedBook.borrowQuantity = buffer;
 			borrowedHolder.push_back(borrowedBook);
 			bookHolder.at(i)->changeQuantity(-stoi(buffer));
-			cout << "Book(s) borrowed successfully!\n";
+			cout << "Book(s) borrowed successfully! You must return on " << borrowDateCalculate(today, bookHolder.at(i)->getBorrowDate()) << "\n";
 			return;
 		}
 	}
@@ -328,11 +346,65 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 
 void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
 	idInputChecker(bookHolder, inputString);
-	string inputName, buffer;
-	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
-	vector<string> customerIDlist;
+	string buffer;
+	vector<customerInfo> customerlist;
 
-	// 
+	int originalBorrowedHolderSize = (int) borrowedHolder.size();
+	// Find the book in borrowedHolder
+	for (int i = 0; i < originalBorrowedHolderSize; i++) {
+		if (borrowedHolder.at(i).bookID == inputString) {
+			customerInfo returnCustomer;
+			cin.ignore();
+			cout << "Enter your customer name: ";
+			do {
+				getline(cin, buffer);
+			} while(!capitalizeWords(buffer));
+			returnCustomer.name = buffer;
+			cout << "Enter your ID: ";
+			do {
+				getline(cin, buffer);
+			} while (!customerIDchecker(buffer));
+			returnCustomer.customerID = buffer;
+			// Check if customer info matches
+			if (borrowedHolder.at(i).info.name != returnCustomer.name || borrowedHolder.at(i).info.customerID != returnCustomer.customerID) {
+				cout << returnCustomer.name << " - " << returnCustomer.customerID << "\n";
+				cout << "No record found for this customer!\n";
+				return;
+			}
+			// Store borrowed info then remove from borrowedHolder
+			BorrowedBookInfo borrowed = borrowedHolder.at(i);
+			borrowedHolder.erase(borrowedHolder.begin() + i);
+			// Increase book quantity in bookHolder and update customer list
+			for (int j = 0; j < (int) bookHolder.size(); j++) {
+				if (bookHolder.at(j)->getID() == inputString) {
+					// Calculate late days
+					int lateDays = 0;
+					lateDays = dayCounter(borrowed.info.borrowDay, today) - bookHolder.at(j)->getBorrowDate();
+					if (lateDays > 0) {
+						cout << "You are late by " << lateDays << " day(s). Please pay fine of " 
+						<< lateDays * bookHolder.at(j)->getPages() * stoi(borrowed.borrowQuantity) 
+						<< " VND.\n";
+						cout << "Press Enter to confirm payment...";
+						cin.get();
+					}
+					else {
+						cout << "Thank you for returning on time!\n";
+					}
+					bookHolder.at(j)->changeQuantity(stoi(borrowed.borrowQuantity));
+					int originalCustomerListSize = (int) bookHolder.at(j)->customerList.size();
+					for (int k = 0; k < originalCustomerListSize; k++) {
+						if (bookHolder.at(j)->customerList.at(k).name == returnCustomer.name && bookHolder.at(j)->customerList.at(k).customerID == returnCustomer.customerID) {
+							bookHolder.at(j)->customerList.erase(bookHolder.at(j)->customerList.begin() + k);
+							break;
+						}
+					}
+					break;
+				}
+			}
+			cout << "Book returned successfully!\n";
+			return;
+		}
+	}
 }
 
 string lowerCase(string str) {
@@ -347,7 +419,10 @@ string lowerCase(string str) {
 }
 
 bool capitalizeWords(string &str) {
-    if (str.size() == 0) return false;
+    if (str.size() == 0) {
+		cout << "Invalid input, please try again: \n";
+		return false;
+    }
     bool newWord = true;
     for (int i = 0; i < (int) str.size(); i++) {
         if (isspace(str[i])) {
@@ -463,6 +538,123 @@ bool dayFormatCheck(string &str) {
     if ((stoi(day) < 1) || (stoi(day) > daysInMonth(stoi(month), stoi(buffer)))) return false;
     str = tempstr + buffer;
     return true;
+}
+
+string borrowDateCalculate(string start, int borrowDuration) {
+    string buffer, day, month, year;
+    int d, m, y;
+    for (char i : start) {
+        if (i != '/') {
+            buffer += i;
+        }
+        else {
+            if (day == "") {
+                day = buffer;
+                buffer = "";
+            }
+            else if (month == "") {
+                month = buffer;
+                buffer = "";
+            }
+        }
+    }
+    year = buffer;
+
+    d = stoi(day);
+    m = stoi(month);
+    y = stoi(year);
+
+    d += borrowDuration;
+    while (d > daysInMonth(m, y)) {
+        d -= daysInMonth(m, y);
+        m++;
+        if (m > 12) {
+            m = 1;
+            y++;
+        }
+    }
+
+    string result = "";
+    if (d < 10) result += "0";
+    result += to_string(d) + "/";
+    if (m < 10) result += "0";
+    result += to_string(m) + "/" + to_string(y);
+    return result;
+}
+
+int dayCounter(string start, string end) {
+    string buffer, day, month;
+    int startDay, endDay = 0;
+    for (char i : start) {
+        if (i != '/') {
+            buffer += i;
+        }
+        else {
+            if (day != "") {
+                if (month == "") {
+                    month = buffer;
+                    buffer = "";
+                }
+            }
+            else {
+                day = buffer;
+                buffer = "";
+            }
+        }
+    }
+
+    startDay = stoi(day);
+    for (int i = 1; i < stoi(month); i++) {
+        startDay += daysInMonth(i, stoi(buffer));
+    }
+    for (int i = 1; i < stoi(buffer); i++) {
+        startDay += isLeap(i) ? 366 : 365;
+    }
+
+    buffer = day = month = "";
+
+    for (char i : end) {
+        if (i != '/') {
+            buffer += i;
+        }
+        else {
+            if (day != "") {
+                if (month == "") {
+                    month = buffer;
+                    buffer = "";
+                }
+            }
+            else {
+                day = buffer;
+                buffer = "";
+            }
+        }
+    }
+
+    endDay += stoi(day);
+    for (int i = 1; i < stoi(month); i++) {
+        endDay += daysInMonth(i, stoi(buffer));
+    }
+    for (int i = 1; i < stoi(buffer); i++) {
+        endDay += isLeap(i) ? 366 : 365;
+    }
+
+    if (endDay < startDay) return 0;
+    return (endDay - startDay);
+}
+
+bool customerIDchecker(string &customerID) {
+	if (customerID.length() != 12) {
+		cout << "Invalid input, please try again.\n";
+		return false;
+	}
+	for (char c : customerID) {
+		if (!isdigit((unsigned char)c)) {
+			cout << "Invalid input, please try again.\n";
+			return false;
+		}
+	}
+	return true;
 }
 /* ---- Functions Definition ----*/
 
