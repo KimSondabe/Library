@@ -80,8 +80,8 @@ void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBoo
 void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string str, const int choice); // Find book by title/author
 void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string title, const string author); // Find book by title & author
 void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook); // Add book(s)
-void Borrow(vector<Books*> &bookHolder, const string today, string &inputString); // Borrow book(s)
-void Return(vector<Books*> &bookHolder, const string today, string &inputString); // Return book(s)
+void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
+void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
 
 string lowerCase(string str); // Convert string to lower case
 bool capitalizeWords(string &s); // Capitalize first letter of each word
@@ -133,11 +133,6 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 		if (bookInfoList[0] != "") {
 			for (int i = 0; i < (int) borrowedHolder.size(); i++){
 				if (borrowedHolder.at(i).bookID == bookInfoList[0]) { 
-					// Minus the borrowed book(s) if someone borrowed
-					if ((stoi(bookInfoList[3]) - stoi(borrowedHolder.at(i).borrowQuantity)) > 0){
-						bookInfoList[3] = to_string(stoi(bookInfoList[3]) - stoi(borrowedHolder.at(i).borrowQuantity));
-					}
-					else bookInfoList[3] = "0";
 					// Store customer infomation into a vector
 					customerList.push_back(borrowedHolder.at(i).info);
 				}
@@ -149,7 +144,7 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 	file.close();
 }
 
-void Write(const string filename, vector<Books*> &bookHolder) { // Update write to borrowedBooks.txt
+void Write(const string filename, vector<Books*> &bookHolder) { 
 	ofstream output(filename);
 
 	output << "*BLANK*\n";
@@ -167,7 +162,7 @@ void Write(const string filename, vector<Books*> &bookHolder) { // Update write 
 void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
 	Write(filename, bookHolder);
 
-	// Update write to borrowedBooks.txt
+	// Write borrowed books file
 	ofstream output("borrowedBooks.txt");
 
 	output << "*BLANK*\n";
@@ -284,24 +279,11 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 	cout << "\n--- Added Book successfully ---\n";
 }
 
-void Borrow(vector<Books*> &bookHolder, const string today, string &inputString) {
+void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
 	idInputChecker(bookHolder, inputString);
-	string inputName, buffer;
+	string buffer;
 	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
 	vector<string> customerIDlist;
-
-	// Read borrowed books file
-	ifstream fileBorrowed("borrowedBooks.txt");
-	while(getline(fileBorrowed, buffer)) {
-		for (int i = 0; i < 5; i++) {
-			getline(fileBorrowed, buffer, '|');
-			if (i == 2) 
-				customerIDlist.push_back(buffer);
-		}
-		if (customerIDlist.size() > 0 && customerIDlist.back() == "") {
-			customerIDlist.pop_back();
-		}
-	}
     
 	// Find the book in bookHolder
 	for (int i = 0; i < (int) bookHolder.size(); i++) {
@@ -310,13 +292,17 @@ void Borrow(vector<Books*> &bookHolder, const string today, string &inputString)
 				cout << "Sorry, this book is out of stock!\n";
 				return;
 			}
-			cout << "Enter your name: ";
-			getline(cin, inputName);
 			customerInfo newCustomer;
-			newCustomer.name = inputName;
-			newCustomer.customerID = idCounter(customerIDlist.back()); // Generate customer ID
+			cout << "Enter your name: ";
+			cin.ignore();
+			getline(cin, buffer);
+			newCustomer.name = buffer;
+			cout << "Enter your ID: ";
+			getline(cin, buffer);
+			newCustomer.customerID = buffer;
 			newCustomer.borrowDay = today;
 			bookHolder.at(i)->customerList.push_back(newCustomer);
+			// Ask for quantity to borrow
 			do {
 				cout << "There are " << bookHolder.at(i)->getQuantity() << " book(s) available.\n";
 				cout << "Enter number of book(s) you want to borrow: ";
@@ -326,12 +312,27 @@ void Borrow(vector<Books*> &bookHolder, const string today, string &inputString)
 				}
 				cout << "Invalid input, please try again.\n";
 			} while(true);
-			bookHolder.at(i)->changeQuantity(-1);
-			cout << "Book borrowed successfully! Your customer ID is: " << newCustomer.customerID << "\n";
+
+			// Add new borrowed book info to vector
+			BorrowedBookInfo borrowedBook;
+			borrowedBook.bookID = inputString;
+			borrowedBook.info = newCustomer;
+			borrowedBook.borrowQuantity = buffer;
+			borrowedHolder.push_back(borrowedBook);
+			bookHolder.at(i)->changeQuantity(-stoi(buffer));
+			cout << "Book(s) borrowed successfully!\n";
 			return;
 		}
 	}
-	
+}
+
+void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
+	idInputChecker(bookHolder, inputString);
+	string inputName, buffer;
+	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
+	vector<string> customerIDlist;
+
+	// 
 }
 
 string lowerCase(string str) {
@@ -506,8 +507,8 @@ int main() {
         cout << "|2. Store into other file     |\n"; // Done
         cout << "|3. View all books            |\n"; // Done
         cout << "|4. Find book                 |\n"; // Done
-        cout << "|5. Borrow a book             |\n"; // Done
-        cout << "|6. Return a book             |\n"; // In Progress
+        cout << "|5. Borrow book (s)           |\n"; // Done
+        cout << "|6. Return book (s)           |\n"; // In Progress
 		cout << "|7. Book borrowed-customer(s) |\n"; // Done
         cout << "|8. Report book's issue       |\n"; // Done
         cout << "|9. Add book(s)               |\n"; // Done
@@ -600,11 +601,12 @@ int main() {
 			}
             
 			case 5: {
-				Borrow(bookHolder, today, inputString);
+				Borrow(bookHolder, borrowedHolder, today, inputString);
 				break;
 			}
 
             case 6: {
+                Return(bookHolder, borrowedHolder, today, inputString);
                 break;
 			}
 
