@@ -1,0 +1,8 @@
+Thông tin cơ bản cthu cthu về cái thư viện
+- Thư viện gồm 7 tầng (level), mỗi tầng có 5 khu (zone) từ A - E
+- Thư viện có nhiều vật phẩm (class bố: LibraryItem) và trong đó có sách ở tầng 1-5
+(class kế thừa: Books), trong đó sách có thể cho mượn, tìm kiếm (?),... ngoài ra còn có
+máy tính bàn từ tầng 5-7 (class kế thừa: Computer) có  thể cho thuê,... (đẻ ra đc j thì thêm)
+- Mô tả các tính năng:
++ ....
++ ....

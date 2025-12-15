@@ -7,6 +7,7 @@ using namespace std;
 typedef struct {
 	string name;
 	string customerID;
+	string customerMail;
 	string borrowDay;
 } customerInfo;
 
@@ -16,7 +17,7 @@ typedef struct {
 	customerInfo info;
 } BorrowedBookInfo;
 
-/* ---- Classes ----*/
+/* ======== Classes ========*/
 class Books{
 	private : 
 		string id;
@@ -40,7 +41,7 @@ class Books{
 			this->customerList = customerList;
 		}
 		
-		/* ---- Getters ----*/
+		/* ======== Getters ========*/
 		string getID() {
 			return id;
 		}
@@ -65,18 +66,18 @@ class Books{
 		int getBorrowDate() {
 			return (stoi(page) / 10 < 14) ? 14 : stoi(page) / 10;
 		}
-		/* ---- Getters ----*/
+		/* ======== Getters ========*/
 
-		/* ---- Setters ----*/
+		/* ======== Setters ========*/
 		void changeQuantity(int quantity) {
 			quantity += stoi(this->quantity);
 			this->quantity = ((quantity < 0) || (quantity > 999)) ? "0" : to_string(quantity);	
 		}
-		/* ---- Setters ----*/
+		/* ======== Setters ========*/
 };
-/* ---- Classes ----*/
+/* ======== Classes ========*/
 
-/* ---- Functions Declare ----*/
+/* ======== Functions Declare ========*/
 void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Read data from file
 void Write(const string filename, vector<Books*> &bookHolder); // Write data to file
 void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Write data to file (overload)
@@ -96,14 +97,14 @@ bool dayFormatCheck(string &str); // Check if user has inserted the right dd/mm/
 int dayCounter(string start, string end); // Count number of days between two dates
 string borrowDateCalculate(string start, int borrowDuration); // Calculate return date based on borrow date and duration
 bool customerIDchecker(string &customerID); // Check valid customer ID input
-/* ---- Functions Declare ----*/
+/* ======== Functions Declare ========*/
 
-/* ---- Functions Definition ----*/
+/* ======== Functions Definition ========*/
 
 void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
-	string buffer, bookInfoList[7], borrowedInfoList[5];
+	string buffer, bookInfoList[7], borrowedInfoList[6];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
-	// borrowed info list: bookID(0), name(1), customerID(2), borrowDay(3), borrowQuantity(4).
+	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	vector<customerInfo> customerList;
 	bool borrowable = true;
 	bookHolder.clear();
@@ -121,15 +122,16 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 			borrowedBook.bookID = borrowedInfoList[0];
 			borrowedBook.info.name = borrowedInfoList[1];
 			borrowedBook.info.customerID = borrowedInfoList[2];
-			borrowedBook.info.borrowDay = borrowedInfoList[3];
-			borrowedBook.borrowQuantity = borrowedInfoList[4];
+			borrowedBook.info.customerMail = borrowedInfoList[3];
+			borrowedBook.info.borrowDay = borrowedInfoList[4];
+			borrowedBook.borrowQuantity = borrowedInfoList[5];
 			borrowedHolder.push_back(borrowedBook);
 		}
 	}
 	fileBorrowed.close();
 
 	// Read main book file
-	ifstream file("library.txt");
+	ifstream file("books.txt");
 	while(getline(file, buffer)) {
 		customerList.clear();
 		for (int i = 0; i < 7; i++) {
@@ -162,7 +164,7 @@ void Write(const string filename, vector<Books*> &bookHolder) {
 	}	
 
 	output.close();
-	cout << "Wrote to \"" << filename << "\"\n";
+	cout << "===== Wrote to \"" << filename << "\" =====\n";
 }
 
 void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
@@ -174,12 +176,12 @@ void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBoo
 	output << "*BLANK*\n";
 	for (int i = 0; i < (int) borrowedHolder.size(); i++) {
 		output << borrowedHolder.at(i).bookID << "|" << borrowedHolder.at(i).info.name << "|" 
-		<< borrowedHolder.at(i).info.customerID << "|" << borrowedHolder.at(i).info.borrowDay << "|"
-		<< borrowedHolder.at(i).borrowQuantity << "|\n";
+		<< borrowedHolder.at(i).info.customerID << "|" << borrowedHolder.at(i).info.customerMail << "|"
+		<< borrowedHolder.at(i).info.borrowDay << "|" << borrowedHolder.at(i).borrowQuantity << "|\n";
 	}	
 
 	output.close();
-	cout << "Wrote to \"borrowedBooks.txt\"\n";
+	cout << "===== Wrote to \"borrowedBooks.txt\" =====\n";
 }
 
 void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string str, const int choice) {
@@ -240,7 +242,7 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 				for (int i = 0; i < (int) bookHolder.size(); i++){
 					if ((bookHolder.at(i)->getID() == foundedBook.front()->getID())) {
 						bookHolder.at(i)->changeQuantity(quantity);
-						cout << "Added " << quantity << " book(s) successfully!\n";
+						cout << "===== Added " << quantity << " book(s) successfully! =====\n";
 						break;
 					}
 				}
@@ -260,17 +262,17 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 	}
 
 	while(true) {
-		cout << "Enter Book's Level (1-10): ";
+		cout << "Enter Book's Level (1-5): ";
 		cin >> level;
 		cin.ignore();
-		if ((level >= 1) && (level <= 10)) break;
+		if ((level >= 1) && (level <= 5)) break;
 		cout << "Invalid input, please try again\n";
 	}
 
 	while(true) {
-		cout << "Enter Book's Zone (A-Z): ";
+		cout << "Enter Book's Zone (A-E): ";
 		cin >> zone;
-		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'Z')) break;
+		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
 		cout << "Invalid input, please try again.\n";
 	}
 
@@ -282,7 +284,7 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 	vector<customerInfo> customerList;
 	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);
-	cout << "\n--- Added Book successfully ---\n";
+	cout << "\n===== Added Book successfully =====\n";
 }
 
 void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
@@ -319,6 +321,12 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 					return;
 				}
 			}
+			cout << "Enter your student mail: ";
+			do {
+				getline(cin, buffer);
+				if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
+			} while (true);
+			newCustomer.customerMail = buffer;
 			bookHolder.at(i)->customerList.push_back(newCustomer);
 			// Ask for quantity to borrow
 			do {
@@ -331,14 +339,15 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 				cout << "Invalid input, please try again.\n";
 			} while(true);
 
-			// Add new borrowed book info to vector
+			// Add new borrowed book info to vector "borrowedHolder"
 			BorrowedBookInfo borrowedBook;
 			borrowedBook.bookID = inputString;
 			borrowedBook.info = newCustomer;
 			borrowedBook.borrowQuantity = buffer;
 			borrowedHolder.push_back(borrowedBook);
 			bookHolder.at(i)->changeQuantity(-stoi(buffer));
-			cout << "Book(s) borrowed successfully! You must return on " << borrowDateCalculate(today, bookHolder.at(i)->getBorrowDate()) << "\n";
+			cout << "===== Book(s) borrowed successfully! =====\n";
+			cout << "You must return on " << borrowDateCalculate(today, bookHolder.at(i)->getBorrowDate()) << "\n";
 			return;
 		}
 	}
@@ -401,7 +410,7 @@ void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 					break;
 				}
 			}
-			cout << "Book returned successfully!\n";
+			cout << "===== Book returned successfully! =====\n";
 			return;
 		}
 	}
@@ -656,7 +665,7 @@ bool customerIDchecker(string &customerID) {
 	}
 	return true;
 }
-/* ---- Functions Definition ----*/
+/* ======== Functions Definition ========*/
 
 int main() {
 	// Variables Declaration (If need more, declare in specific functions)
@@ -681,7 +690,7 @@ int main() {
 	do {
 		cin >> passcode;
 		cin.ignore();				
-		if (passcode == 123456) {
+		if (passcode == 1) {
 			ReadFile(bookHolder, borrowedHolder);
 			break;
 		}
@@ -694,7 +703,7 @@ int main() {
 	status = true;
     while(status) {
 		cout << "\n";
-        cout << "-------------- Library --------------\n";
+        cout << "============== Library ==============\n";
         cout << "|1. Number of books                 |\n"; // Done
         cout << "|2. Store data into other file      |\n"; // Done
         cout << "|3. View all books                  |\n"; // Done
@@ -706,7 +715,7 @@ int main() {
         cout << "|9. Add book(s)                     |\n"; // Done
 		cout << "|10. Move book(s) to another place  |\n"; // To be done
         cout << "|11. Exit                           |\n"; // Done
-        cout << "-------------------------------------\n";
+        cout << "=====================================\n";
         cout << "Enter your choice: ";
         cin >> choice;
 		cin.ignore();
@@ -724,28 +733,28 @@ int main() {
 			}
 
             case 2: {
-				Write("libraryCopy.txt", bookHolder);
+				Write("booksCopy.txt", bookHolder);
                 break;
 			}
 
             case 3: {
                 cout << "Here are the book titles\' list\n";
-				cout << "---------------\n";
+				cout << "===================\n";
 				for (int i = 0; i < (int) bookHolder.size(); i++) {
 					cout << "\"" << bookHolder.at(i)->getTitle() << "\" by " << bookHolder.at(i)->getAuthor()
 					<< " with " << bookHolder.at(i)->getQuantity() << " books.\n";
 				}
-				cout << "---------------\n";
+				cout << "==================\n";
                 break;
 			}
 
             case 4: {
 				do {
-					cout << "--------------------------------------------\n";
+					cout << "=============================================\n";
 					cout << "|Do you want to search by Title or Author  |\n";
 					cout << "|1. Title                                  |\n";
 					cout << "|2. Author                                 |\n";
-					cout << "--------------------------------------------\n";
+					cout << "=============================================\n";
 					cout << "Enter your choice: "; 
 					cin >> inputNumber;
 					cin.ignore();
@@ -805,7 +814,13 @@ int main() {
 							for (int j = 0; j < (int) bookHolder.at(i)->customerList.size(); j++) {
 								cout << "- \"" << bookHolder.at(i)->customerList.at(j).name << "\" with ID: \'" 
 								<< bookHolder.at(i)->customerList.at(j).customerID 
-								<< "\' and borrowed in " << bookHolder.at(i)->customerList.at(j).borrowDay << "\n";
+								<< "\' and borrowed in " << bookHolder.at(i)->customerList.at(j).borrowDay;
+								if ((dayCounter(bookHolder.at(i)->customerList.at(j).borrowDay, today) - bookHolder.at(i)->getBorrowDate()) > 0) {
+									cout << " (late for " << (dayCounter(bookHolder.at(i)->customerList.at(j).borrowDay, today) - bookHolder.at(i)->getBorrowDate())
+									<< " day(s))\n";
+									cout << "Sent email to " << bookHolder.at(i)->customerList.at(j).customerMail << "\n";
+								}
+								else cout << "\n";
 							}
 						}
 					}
@@ -855,7 +870,7 @@ int main() {
 			}
 
             case 11: {
-				Write("library.txt", bookHolder, borrowedHolder);
+				Write("books.txt", bookHolder, borrowedHolder);
 				for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
 					delete bookHolder.at(i);
 				cout << "\nThanks for comming have a good day !\n";
