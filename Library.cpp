@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 typedef struct {
@@ -139,6 +140,9 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	vector<customerInfo> customerList;
 	bool borrowable = true;
+    for (Books* b : bookHolder) {
+        delete b;
+    }
 	bookHolder.clear();
 	borrowedHolder.clear();
 	Acc.clear();
@@ -146,8 +150,12 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 	// Read borrowed books file
 	ifstream fileBorrowed("borrowedBooks.txt");
 	while(getline(fileBorrowed, buffer)) {
+        if(buffer.empty()) {
+            continue;
+        }
+        stringstream ss(buffer);
 		for (int i = 0; i < 5; i++) {
-			getline(fileBorrowed, buffer, '|');
+			getline(ss, buffer, '|');
 			borrowedInfoList[i] = buffer;
 		}
 		if (borrowedInfoList[0] != "") {
@@ -166,8 +174,12 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 	//Read account file
 	ifstream acc("account.txt");
 	while(getline(acc, buffer)){
+        if(buffer.empty()) {
+            continue;
+        }
+        stringstream ss(buffer);
 		for (int i = 0; i < 4; i++) {
-			getline(acc, buffer, '|');
+			getline(ss, buffer, '|');
 			accountList[i] = buffer;
 		}
 		if(accountList[0] != ""){
@@ -181,8 +193,12 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 	ifstream file("books.txt");
 	while(getline(file, buffer)) {
 		customerList.clear();
+        if(buffer.empty()) {
+            continue;
+        }
+        stringstream ss(buffer);
 		for (int i = 0; i < 7; i++) {
-			getline(file, buffer, '|');
+			getline(ss, buffer, '|');
 			bookInfoList[i] = buffer;
 		}
 		if (bookInfoList[0] != "") {
@@ -194,6 +210,7 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 			}
 			Books* book = new Books(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
 			bookHolder.push_back(book);
+            
 		}
 	}
 	file.close();
