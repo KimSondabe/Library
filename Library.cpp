@@ -209,37 +209,28 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 				}
 			}
 			Books* book = new Books(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
-			bookHolder.push_back(book);
-            
+			bookHolder.push_back(book);           
 		}
 	}
 	file.close();
-
-	
 }
 
 void Write(const string filename, vector<Books*> &bookHolder) { 
 	ofstream output(filename);
-
-	output << "*BLANK*\n";
 	for (int i = 0; i < (int) bookHolder.size(); i++) {
 		output << bookHolder.at(i)->getID() << "|" << bookHolder.at(i)->getTitle() << "|" 
 		<< bookHolder.at(i)->getAuthor() << "|" << bookHolder.at(i)->getQuantity() << "|"
 		<< bookHolder.at(i)->getPages() << "|" << bookHolder.at(i)->getLevel() << "|"
 		<< bookHolder.at(i)->getZone() << "|\n";
 	}	
-
 	output.close();
 	cout << "===== Wrote to \"" << filename << "\" =====\n";
 }
 
 void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
 	Write(filename, bookHolder);
-
 	// Write borrowed books file
 	ofstream output("borrowedBooks.txt");
-
-	output << "*BLANK*\n";
 	for (int i = 0; i < (int) borrowedHolder.size(); i++) {
 		output << borrowedHolder.at(i).bookID << "|" << borrowedHolder.at(i).info.name << "|" 
 		<< borrowedHolder.at(i).info.customerID << "|" << borrowedHolder.at(i).info.customerMail << "|"
@@ -488,7 +479,7 @@ bool CheckAcc(vector<Account> &Acc, string username, string password){
 			if(password == Acc.at(i).getPass()){
 				return true; //Check acccount when sign in 
 			}
-			return true; //Check account had the same username
+			
 		}
 	}
 	return false;
