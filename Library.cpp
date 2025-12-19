@@ -116,9 +116,13 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook); // Add book(s
 void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
 void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
 
-bool CheckAcc(vector<Account> &Acc, string username, string password); //Check if the account exists or have the same username;
+bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
+bool CheckUser(vector<Account> &Acc, string username); //Check if username existed
 string getIndexAcc(vector<Account> &Acc, string &username, string &password); //Get account index
 bool isAdmin(vector<Account> &Acc, string index); //Check if the account is a admin
+void Write(vector<Account> &Acc); //Write accounts to file
+void CreateAcc(vector<Account> &Acc); // Create Acc
+void DisplayAcc(vector<Account> &Acc); //Display Acc
 
 string lowerCase(string str); // Convert string to lower case
 bool capitalizeWords(string &s); // Capitalize first letter of each word
@@ -473,7 +477,7 @@ void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 	}
 }
 
-bool CheckAcc(vector<Account> &Acc, string username, string password){
+bool CheckPass(vector<Account> &Acc, string username, string password){
 	for(int i = 0; i < Acc.size(); i++){
 		if(username == Acc.at(i).getUser()){
 			if(password == Acc.at(i).getPass()){
@@ -498,6 +502,49 @@ bool isAdmin(vector<Account> &Acc, string index){
 	int i = stoi(index);
 	if(Acc.at(i).getRole() == "admin"){return true;}
 	return false;
+}
+
+bool CheckUser(vector<Account> &Acc, string username){
+	for(int i = 0; i < Acc.size(); i++){
+		if(username == Acc.at(i).getUser()){
+			return true;
+		}
+	}
+	return false;
+}
+
+void Write(vector<Account> &Acc){
+	ofstream output("borrowedBooks.txt");
+	
+	output << "*BLANK*\n";
+	for(int i = 0; i < (int)Acc.size(); i++){
+		output << Acc.at(i).getIndex() << "|" << Acc.at(i).getUser() << "|" << Acc.at(i).getPass() << "|" << Acc.at(i).getRole() << "|\n";
+	}
+	output.close();
+	cout << "===== Wrote to \"account.txt\" =====\n";
+}
+
+void CreateAcc(vector<Account> &Acc){
+	string username, password;	
+	do{
+		cout << "Create account\n";
+		cout << "Username: "; cin >> username;
+		cout << "Password: "; cin >> password;
+		if(CheckUser(Acc, username)){
+			cout << "Existed Username\n";
+		}else{
+			Account acc(to_string(1 + Acc.size()),username, password, "user");
+			Acc.push_back(acc);			
+			break;
+		}
+	}while(true);
+	cout << "====Create account successfully ====\n";
+}
+
+void DisplayAcc(vector<Account> &Acc){
+	for(int i = 0; i < Acc.size(); i++){
+		cout << Acc.at(i).getIndex() << " " << Acc.at(i).getUser() << " " << Acc.at(i).getPass() <<" "<< Acc.at(i).getRole() << "\n";
+	}
 }
 
 string lowerCase(string str) {
@@ -776,7 +823,7 @@ int main() {
 	do {
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
-		if(CheckAcc(Acc, username, password)){
+		if(CheckPass(Acc, username, password)){
 			cout << "Successfully!\n";
 			break;
 		}else{
@@ -793,13 +840,14 @@ int main() {
 			cout << "|1. Number of books                 |\n"; // Done
 			cout << "|2. Store data into other file      |\n"; // Done
 			cout << "|3. View all books                  |\n"; // Done
-			cout << "|4. Find book                       |\n"; // Done
-			cout << "|5. View book borrower(s)           |\n"; // Done
-			cout << "|6. Report book's issue             |\n"; // Done
-			cout << "|7. Add book(s)                     |\n"; // Done
-			cout << "|8. Move book(s) to another place   |\n"; // To be done
-			cout << "|9. Create an account               |\n"; //Undone
-			cout << "|10. Exit                           |\n"; // Done
+			cout << "|4. View all accounts               |\n"; //Done
+			cout << "|5. Find book                       |\n"; // Done
+			cout << "|6. View book borrower(s)           |\n"; // Done
+			cout << "|7. Report book's issue             |\n"; // Done
+			cout << "|8. Add book(s)                     |\n"; // Done
+			cout << "|9. Move book(s) to another place   |\n"; // To be done
+			cout << "|10. Create an account               |\n"; //Undone
+			cout << "|11. Exit                           |\n"; // Done
 			cout << "=====================================\n";
 			cout << "Enter your choice: ";
 			cin >> choice;
@@ -834,6 +882,11 @@ int main() {
 				}
 
 				case 4: {
+					DisplayAcc(Acc);
+					break;
+				}
+
+				case 5: {
 					do {
 						cout << "=============================================\n";
 						cout << "|Do you want to search by Title or Author  |\n";
@@ -887,7 +940,7 @@ int main() {
 					break;
 				}
 				
-				case 5: {
+				case 6: {
 					idInputChecker(bookHolder, inputString);
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
 						if (bookHolder.at(i)->getID() == inputString) {
@@ -912,7 +965,7 @@ int main() {
 					}
 					break;
 				}
-				case 6: {
+				case 7: {
 					idInputChecker(bookHolder, inputString);				
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
 						if (bookHolder.at(i)->getID() == inputString) {
@@ -933,22 +986,22 @@ int main() {
 					break;
 				}
 
-				case 7: {
+				case 8: {
 					Add(bookHolder, foundedBook);
 					break;
 				}
 
-				case 8: {
+				case 9: {
 					cout << "This feature is under development, please wait for the next version!\n";
 					break;
 				}
 
-				case 9:{
-					cout << "This feature is under development, please wait for the next version!\n";
+				case 10:{
+					CreateAcc(Acc);
 					break;
 				}
 
-				case 10: {
+				case 11: {
 					Write("books.txt", bookHolder, borrowedHolder);
 					for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
 						delete bookHolder.at(i);
