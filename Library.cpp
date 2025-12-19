@@ -135,11 +135,11 @@ bool customerIDchecker(string &customerID); // Check valid customer ID input
 /* ======== Functions Definition ========*/
 
 void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc) {
-	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[4];
+	string buffer, bookInfoList[7], borrowedInfoList[5], accountList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	vector<customerInfo> customerList;
-	bool borrowable = true;
+	
     for (Books* b : bookHolder) {
         delete b;
     }
