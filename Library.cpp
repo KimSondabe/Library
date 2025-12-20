@@ -525,7 +525,7 @@ void Write(vector<Account> &Acc){
 }
 
 void CreateAcc(vector<Account> &Acc){
-	string username, password;	
+	string username, password, role;
 	do{
 		cout << "Create account\n";
 		cout << "Username: "; cin >> username;
@@ -533,7 +533,8 @@ void CreateAcc(vector<Account> &Acc){
 		if(CheckUser(Acc, username)){
 			cout << "Existed Username\n";
 		}else{
-			Account acc(to_string(1 + Acc.size()),username, password, "user");
+			cout << "Account's Role: "; cin >> role;
+			Account acc(to_string(1 + Acc.size()),username, password, role);
 			Acc.push_back(acc);			
 			break;
 		}
@@ -543,7 +544,7 @@ void CreateAcc(vector<Account> &Acc){
 
 void DisplayAcc(vector<Account> &Acc){
 	for(int i = 0; i < Acc.size(); i++){
-		cout << Acc.at(i).getIndex() << " " << Acc.at(i).getUser() << " " << Acc.at(i).getPass() <<" "<< Acc.at(i).getRole() << "\n";
+		cout << Acc.at(i).getIndex() << "|" << Acc.at(i).getUser() << "|" << Acc.at(i).getPass() <<"|"<< Acc.at(i).getRole() << "|\n";
 	}
 }
 
@@ -846,7 +847,7 @@ int main() {
 			cout << "|7. Report book's issue             |\n"; // Done
 			cout << "|8. Add book(s)                     |\n"; // Done
 			cout << "|9. Move book(s) to another place   |\n"; // To be done
-			cout << "|10. Create an account               |\n"; //Undone
+			cout << "|10. Create an account              |\n"; //Undone
 			cout << "|11. Exit                           |\n"; // Done
 			cout << "=====================================\n";
 			cout << "Enter your choice: ";
