@@ -1,6 +1,6 @@
 #include "library.h"
 
-void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc) {
+void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
 	string buffer, bookInfoList[7], borrowedInfoList[5], accountList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
@@ -68,6 +68,7 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 			bookInfoList[i] = buffer;
 		}
 		if (bookInfoList[0] != "") {
+            setID.insert(bookInfoList[0]);
 			for (int i = 0; i < (int) borrowedHolder.size(); i++){
 				if (borrowedHolder.at(i).bookID == bookInfoList[0]) { 
 					// Store customer infomation into a vector
@@ -79,6 +80,47 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 		}
 	}
 	file.close();
+}
+
+void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+    for(auto x : setID) {
+        cout<<x<<" ";
+    }
+    bool validMode = false;
+    string mode;
+    while(!validMode) {
+        cout << "Move books by ID or Name: ";
+        getline(cin,mode);
+        cout<<"\n";
+        if(mode == "ID" || mode == "Name") {
+            validMode = true;
+        }else {
+            cout << "Invalid mode \n ";
+        }
+    }
+    if(mode == "ID") {
+        string id;
+        bool validID = false;
+        while(!validID) {
+            cout << "ID: ";
+            getline(cin,id);
+            if(setID.find(id) != setID.end()) {
+                validID = true;
+            }else {
+                cout<<"Invalid ID\n";
+            }
+        }
+        int indexOfID = stoi(id) - 1;
+        string zone;
+        cout<<"Zone: ";
+        getline(cin, zone);
+        cout<<"\n";
+        string level;
+        cout<<"Level: ";
+        getline(cin, level);
+        bookHolder[indexOfID]->setZone(zone);
+        bookHolder[indexOfID]->setLevel(level);
+    }
 }
 
 void Write(const string filename, vector<Books*> &bookHolder) { 
@@ -138,24 +180,19 @@ void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string 
 	}
 }
 
-void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
+void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
     string id, title, author, zone;
 	int quantity, level, page;
-
 	// Checking book's title and author
-	
 	cout << "Enter Book's Title: ";
     do {
 		getline(cin, title);
 	} while(!capitalizeWords(title));
-
 	cout << "Enter Book's Author: ";
     do {
 		getline(cin, author);
 	} while(!capitalizeWords(author));
-
 	Find(bookHolder, foundedBook, title, author); // Check for same book title & author
-
 	while(true) {
 		cout << "Enter Book's Quantity (<= 999): ";
 		cin >> quantity;
@@ -175,7 +212,6 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 		}
 		cout << "Invalid input, please try again.\n";
 	}
-
 	while(true) {
 		cout << "Enter Book's Page (0 < page < 9999): ";
 		cin >> page;
@@ -183,7 +219,6 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 		if ((page > 0) && (page < 9999)) break;
 		cout << "Invalid input, please try again.\n";
 	}
-
 	while(true) {
 		cout << "Enter Book's Level (1-5): ";
 		cin >> level;
@@ -191,19 +226,18 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook) {
 		if ((level >= 1) && (level <= 5)) break;
 		cout << "Invalid input, please try again\n";
 	}
-
 	while(true) {
 		cout << "Enter Book's Zone (A-E): ";
 		cin >> zone;
 		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
 		cout << "Invalid input, please try again.\n";
 	}
-
 	if (bookHolder.empty()) {
 		id = "0001";
 	} else {
 		id = idCounter(bookHolder.back()->getID());
 	}
+    setID.insert(id);
 	vector<customerInfo> customerList;
 	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);

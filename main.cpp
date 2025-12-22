@@ -12,7 +12,9 @@ int main() {
 	vector<Books*> foundedBook;
 	vector<BorrowedBookInfo> borrowedHolder;
 	vector<Account> Acc;
-
+    unordered_set<string> setID;
+    unordered_map<string,int> indexOfBook;
+    
 	// Entrance interface (login, date input, file read)
 	cout << "Today is: ";
 	do {
@@ -20,7 +22,7 @@ int main() {
 		if (dayFormatCheck(today)) break;
 		cout << "Invalid date format, please try again (dd/mm/yyyy): ";
 	} while(true);
-	ReadFile(bookHolder, borrowedHolder, Acc);
+	ReadFile(bookHolder, borrowedHolder, Acc, setID, indexOfBook);
 	do {
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
@@ -172,12 +174,12 @@ int main() {
 				}
 
 				case 8: {
-					Add(bookHolder, foundedBook);
+					Add(bookHolder, foundedBook, setID, indexOfBook);
 					break;
 				}
 
 				case 9: {
-					cout << "This feature is under development, please wait for the next version!\n";
+					MoveBooks(bookHolder, setID, indexOfBook);
 					break;
 				}
 
@@ -281,7 +283,6 @@ int main() {
 					cout << "Invalid syntax, please retry!\n";
 				}
 			}
-
 		}
     }
     return 0;

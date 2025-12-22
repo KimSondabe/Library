@@ -288,6 +288,7 @@ int getChoice(int &choice){
     cin >> choice;
 	cin.ignore();
 	cout << "\n";
+    return choice;
 }
 
 void Exit(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc){
