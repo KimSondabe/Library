@@ -1,5 +1,6 @@
 #include "library.h"
 
+/*------ General Function ------*/
 string lowerCase(string str) {
 	string result = "";
 	for (char i : str) {
@@ -35,6 +36,7 @@ bool capitalizeWords(string &str) {
     return true;
 }
 
+/*------ Books Function ------*/
 string idCounter(string prevID) {
     if (prevID.size() != 4) return "";
     for (char c : prevID) { 
@@ -74,6 +76,21 @@ void idInputChecker(vector<Books*> &bookHolder, string &inputString) {
 	} while(true);
 }
 
+bool customerIDchecker(string &customerID) {
+	if (customerID.length() != 12) {
+		cout << "Invalid input, please try again.\n";
+		return false;
+	}
+	for (char c : customerID) {
+		if (!isdigit((unsigned char)c)) {
+			cout << "Invalid input, please try again.\n";
+			return false;
+		}
+	}
+	return true;
+}
+
+/*-------- Date Function --------*/
 bool isLeap(int year) {
 	return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
 }
@@ -236,16 +253,47 @@ int dayCounter(string start, string end) {
     return (endDay - startDay);
 }
 
-bool customerIDchecker(string &customerID) {
-	if (customerID.length() != 12) {
-		cout << "Invalid input, please try again.\n";
-		return false;
-	}
-	for (char c : customerID) {
-		if (!isdigit((unsigned char)c)) {
-			cout << "Invalid input, please try again.\n";
-			return false;
-		}
-	}
-	return true;
+/*-------- UI Function --------*/
+
+void adminMenu(){
+    cout << "\n";
+	cout << "============== Library ==============\n";
+	cout << "|1. Number of books                 |\n"; // Done
+	cout << "|2. Store data into other file      |\n"; // Done
+    cout << "|3. View all books                  |\n"; // Done
+	cout << "|4. View all accounts               |\n"; //Done
+	cout << "|5. Find book                       |\n"; // Done
+    cout << "|6. View book borrower(s)           |\n"; // Done
+	cout << "|7. Report book's issue             |\n"; // Done
+	cout << "|8. Add book(s)                     |\n"; // Done
+	cout << "|9. Move book(s) to another place   |\n"; // To be done
+	cout << "|10. Create an account              |\n"; //Undone
+	cout << "|11. Exit                           |\n"; // Done
+	cout << "=====================================\n";
+}
+
+void userMenu(){
+    cout << "\n";
+	cout << "============== Library ==============\n";
+	cout << "|1. View all books                  |\n"; // Done
+	cout << "|2. Find book                       |\n"; // Done
+	cout << "|3. Borrow book (s)                 |\n"; // Done
+	cout << "|4. Return book (s)                 |\n"; // Done
+	cout << "|5. Exit                            |\n"; // Done
+	cout << "=====================================\n";
+}
+
+int getChoice(int &choice){
+    cout << "Enter your choice: ";
+    cin >> choice;
+	cin.ignore();
+	cout << "\n";
+}
+
+void Exit(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc){
+    Write("books.txt", bookHolder, borrowedHolder);
+    Write(Acc);
+	for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
+	delete bookHolder.at(i);
+	cout << "\nThanks for comming have a good day !\n";
 }

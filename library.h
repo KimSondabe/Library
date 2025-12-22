@@ -116,5 +116,9 @@ bool dayFormatCheck(string &str); // Check if user has inserted the right dd/mm/
 int dayCounter(string start, string end); // Count number of days between two dates
 string borrowDateCalculate(string start, int borrowDuration); // Calculate return date based on borrow date and duration
 bool customerIDchecker(string &customerID); // Check valid customer ID input
+void adminMenu();//UI Admin's Menu
+void userMenu();//UI User's Menu
+int getChoice(int &choice);//get userchoice
+void Exit(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc);//Exit
 
 #endif 

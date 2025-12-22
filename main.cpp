@@ -36,24 +36,8 @@ int main() {
 	status = true;
     while(status) {
 		if(isAdmin(Acc, getIndexAcc(Acc, username, password))){
-			cout << "\n";
-			cout << "============== Library ==============\n";
-			cout << "|1. Number of books                 |\n"; // Done
-			cout << "|2. Store data into other file      |\n"; // Done
-			cout << "|3. View all books                  |\n"; // Done
-			cout << "|4. View all accounts               |\n"; //Done
-			cout << "|5. Find book                       |\n"; // Done
-			cout << "|6. View book borrower(s)           |\n"; // Done
-			cout << "|7. Report book's issue             |\n"; // Done
-			cout << "|8. Add book(s)                     |\n"; // Done
-			cout << "|9. Move book(s) to another place   |\n"; // To be done
-			cout << "|10. Create an account              |\n"; //Undone
-			cout << "|11. Exit                           |\n"; // Done
-			cout << "=====================================\n";
-			cout << "Enter your choice: ";
-			cin >> choice;
-			cin.ignore();
-			cout << "\n";
+			adminMenu();
+			getChoice(choice);
 
 			switch(choice) {
 				case 1: { 
@@ -203,10 +187,7 @@ int main() {
 				}
 
 				case 11: {
-					Write("books.txt", bookHolder, borrowedHolder);
-					for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
-						delete bookHolder.at(i);
-					cout << "\nThanks for comming have a good day !\n";
+					Exit(bookHolder,borrowedHolder,Acc);
 					status = false;
 					break;
 				}
@@ -217,18 +198,8 @@ int main() {
         	}
 		}
 		else{
-			cout << "\n";
-			cout << "============== Library ==============\n";
-			cout << "|1. View all books                  |\n"; // Done
-			cout << "|2. Find book                       |\n"; // Done
-			cout << "|3. Borrow book (s)                 |\n"; // Done
-			cout << "|4. Return book (s)                 |\n"; // Done
-			cout << "|5. Exit                            |\n"; // Done
-			cout << "=====================================\n";
-			cout << "Enter your choice: ";
-			cin >> choice;
-			cin.ignore();
-			cout << "\n";
+			userMenu();
+			getChoice(choice);
 			switch(choice){
 				case 1:{
 					cout << "Here are the book titles\' list\n";
@@ -302,10 +273,7 @@ int main() {
 					break;
 				}
 				case 5:{
-					Write("books.txt", bookHolder, borrowedHolder);
-					for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
-						delete bookHolder.at(i);
-					cout << "\nThanks for comming have a good day !\n";
+					Exit(bookHolder,borrowedHolder,Acc);
 					status = false;
 					break;
 				}
