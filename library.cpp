@@ -21,31 +21,48 @@ typedef struct {
 	customerInfo info;
 } BorrowedBookInfo;
 
-class Books{
-	private : 
+class LibraryItems {
+	private:
 		string id;
+		string level;
+		string zone;
+	public:
+		/* ======== Constructor ======== */
+		LibraryItems(string id, string level, string zone)
+		: id(id), level(level), zone(zone) {}
+		/* ======== Constructor ======== */
+
+		/* ======== Getters ========*/
+		string getID() {return id;}
+		int getLevel() {return stoi(level);}
+		string getZone() {return zone;}
+		/* ======== Getters ========*/
+
+		/* ======== Setters ========*/
+		void setLevel(string level) {this->level = level;}
+		void setZone(string zone) {this->zone = zone;}
+		/* ======== Setters ========*/
+};
+
+class Books : public LibraryItems {
+	private : 
 		string title;
 		string author;
 		string quantity;
 		string page;
-		string level;
-		string zone;
 	public :
 		vector<customerInfo> customerList;
 
         /* ======== Constructor ======== */
 		Books(string id, string title, string author, string quantity, string page, string level, string zone, vector<customerInfo> customerList)
-        : id(id), title(title), author(author), quantity(quantity), page(page), level(level), zone(zone), customerList(customerList) {}
+        : LibraryItems(id, level, zone), title(title), author(author), quantity(quantity), page(page), customerList(customerList) {}
 		/* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
-		string getID() {return id;}
 		string getTitle() {return title;}
 		string getAuthor() {return author;} 
 		int getQuantity() {return stoi(quantity);}
 		int getPages() {return stoi(page);}
-		int getLevel() {return stoi(level);}
-		string getZone() {return zone;}
 		int getBorrowDate() {return (stoi(page) / 10 < 14) ? 14 : stoi(page) / 10;}
 		/* ======== Getters ========*/
 
@@ -54,12 +71,26 @@ class Books{
 			quantity += stoi(this->quantity);
 			this->quantity = ((quantity < 0) || (quantity > 999)) ? "0" : to_string(quantity);	
 		}
-        void setLevel(string level) {
-            this->level = level;
-        }
-        void setZone(string zone) {
-            this->zone = zone;
-        }
+		/* ======== Setters ========*/
+};
+
+class Computers : public LibraryItems {
+	private:
+		string specs;
+	public:
+		/* ======== Constructor ======== */
+		Computers(string id, string level, string zone, string specs)
+		: LibraryItems(id, level, zone), specs(specs) {}
+		/* ======== Constructor ======== */
+
+		/* ======== Getters ========*/
+		int rentMoney(int hours) {
+			return (specs == "HIGH") ? 12000 * hours : (specs == "MID") ? 10000 * hours : 7000 * hours;
+		}
+		/* ======== Getters ========*/
+
+		/* ======== Setters ========*/
+		void setSpecs(string specs) {this->specs = specs;}
 		/* ======== Setters ========*/
 };
 
