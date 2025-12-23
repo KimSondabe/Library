@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <ctime>
 
 using namespace std;
 
@@ -150,7 +151,6 @@ bool capitalizeWords(string &s); // Capitalize first letter of each word
 //Date Function 
 bool isLeap(int year); // Check leap year
 int daysInMonth(int month, int year); // Check number of days in month
-bool dayFormatCheck(string &str); // Check if user has inserted the right dd/mm/yyyy format and normalize
 int dayCounter(string start, string end); // Count number of days between two dates
 string borrowDateCalculate(string start, int borrowDuration); // Calculate return date based on borrow date and duration
 
@@ -185,14 +185,18 @@ int main() {
     unordered_map<string,int> indexOfBook;
     int bookIndex = 0; // index of book by name in vector bookHolder
     
-	// Entrance interface (login, date input, file read)
+	// Today's date
 	cout << "Today is: ";
-	do {
-		getline(cin, today);
-		if (dayFormatCheck(today)) break;
-		cout << "Invalid date format, please try again (dd/mm/yyyy): ";
-	} while(true);
+	time_t now = time(0);
+	ctime(&now);
+	tm *ltm = localtime(&now);
+	today = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
+	cout << today << "\n";
+
+	// Read data from file
 	ReadFile(bookHolder, borrowedHolder, Acc, setID, indexOfBook, bookIndex);
+	
+	// Login interface
 	do {
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
@@ -1054,52 +1058,6 @@ int daysInMonth(int month, int year) {
         case 2: return isLeap(year) ? 29 : 28;
     }
     return 0;
-}
-
-bool dayFormatCheck(string &str) {
-    string buffer, tempstr = "";
-    if (str.find('/') == string::npos) return false;
-    for (char i : str ) {
-        if (i != '/') {
-            buffer += i;
-        }
-        else {
-            for (char j : buffer) {
-                if ((j < '0') || (j > '9')) return false;
-            }
-            if (buffer.size() == 1) {
-                if (buffer == "0") return false;
-                else {
-                    buffer = "0" + buffer;
-                }
-            }
-            else if (buffer.size() < 1 || buffer.size() > 2) return false;
-            tempstr += (buffer + "/");
-            buffer = "";
-        }
-    }
-    for (char i : buffer) {
-        if ((i < '0') || (i > '9')) return false;
-    }
-    if (buffer.size() != 4) return false;
-
-    string day, month;
-    int count = 0;
-    for (char i : tempstr) {
-        if (i != '/') {
-            if (count <= 1) {
-                count++;
-                day += i;
-            }
-            else {
-                month += i;
-            }
-        }
-    }
-    
-    if ((stoi(day) < 1) || (stoi(day) > daysInMonth(stoi(month), stoi(buffer)))) return false;
-    str = tempstr + buffer;
-    return true;
 }
 
 string borrowDateCalculate(string start, int borrowDuration) {
