@@ -293,10 +293,8 @@ int getChoice(int &choice){
     return choice;
 }
 
-void Exit(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc){
+void Exit(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc){
     Write("books.txt", bookHolder, borrowedHolder);
     Write(Acc);
-	for (int i = 0; i < (int) bookHolder.size(); i++)  // Clean up data
-	delete bookHolder.at(i);
 	cout << "\nThanks for comming have a good day !\n";
 }

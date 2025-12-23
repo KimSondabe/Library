@@ -8,8 +8,8 @@ int main() {
     int inputNumber;
 	string inputString, today;
 	string username, password;
-    vector<Books*> bookHolder;
-	vector<Books*> foundedBook;
+    vector<Books> bookHolder;
+	vector<Books> foundedBook;
 	vector<BorrowedBookInfo> borrowedHolder;
 	vector<Account> Acc;
     unordered_set<string> setID;
@@ -44,7 +44,7 @@ int main() {
 			switch(choice) {
 				case 1: { 
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						quantitiesSum += bookHolder.at(i)->getQuantity();
+						quantitiesSum += bookHolder.at(i).getQuantity();
 					}
 					cout << "There are " << bookHolder.size() << " book titles & " 
 					<< quantitiesSum << " books in total\n"; 
@@ -61,8 +61,8 @@ int main() {
 					cout << "Here are the book titles\' list\n";
 					cout << "===================\n";
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						cout << "\"" << bookHolder.at(i)->getTitle() << "\" by " << bookHolder.at(i)->getAuthor()
-						<< " with " << bookHolder.at(i)->getQuantity() << " books.\n";
+						cout << "\"" << bookHolder.at(i).getTitle() << "\" by " << bookHolder.at(i).getAuthor()
+						<< " with " << bookHolder.at(i).getQuantity() << " books.\n";
 					}
 					cout << "==================\n";
 					break;
@@ -121,8 +121,8 @@ int main() {
 
 					cout << "The book(s) you want to search for are:\n";
 					for (int i = 0; i < (int) foundedBook.size(); i++) {
-						cout << "\"" << foundedBook.at(i)->getTitle() << "\" by " << foundedBook.at(i)->getAuthor() << " with " << foundedBook.at(i)->getQuantity()
-						<< " books in level \'" << foundedBook.at(i)->getLevel() << "\' and zone \'" << foundedBook.at(i)->getZone() << "\'!\n"; 
+						cout << "\"" << foundedBook.at(i).getTitle() << "\" by " << foundedBook.at(i).getAuthor() << " with " << foundedBook.at(i).getQuantity()
+						<< " books in level \'" << foundedBook.at(i).getLevel() << "\' and zone \'" << foundedBook.at(i).getZone() << "\'!\n"; 
 					}
 					break;
 				}
@@ -130,20 +130,20 @@ int main() {
 				case 6: {
 					idInputChecker(bookHolder, inputString);
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						if (bookHolder.at(i)->getID() == inputString) {
-							if (bookHolder.at(i)->customerList.empty()) {
+						if (bookHolder.at(i).getID() == inputString) {
+							if (bookHolder.at(i).customerList.empty()) {
 								cout << "There are no customer whom borrowed this book!\n";
 							}
 							else {
 								cout << "They are:\n";
-								for (int j = 0; j < (int) bookHolder.at(i)->customerList.size(); j++) {
-									cout << "- \"" << bookHolder.at(i)->customerList.at(j).name << "\" with ID: \'" 
-									<< bookHolder.at(i)->customerList.at(j).customerID 
-									<< "\' and borrowed in " << bookHolder.at(i)->customerList.at(j).borrowDay;
-									if ((dayCounter(bookHolder.at(i)->customerList.at(j).borrowDay, today) - bookHolder.at(i)->getBorrowDate()) > 0) {
-										cout << " (late for " << (dayCounter(bookHolder.at(i)->customerList.at(j).borrowDay, today) - bookHolder.at(i)->getBorrowDate())
+								for (int j = 0; j < (int) bookHolder.at(i).customerList.size(); j++) {
+									cout << "- \"" << bookHolder.at(i).customerList.at(j).name << "\" with ID: \'" 
+									<< bookHolder.at(i).customerList.at(j).customerID 
+									<< "\' and borrowed in " << bookHolder.at(i).customerList.at(j).borrowDay;
+									if ((dayCounter(bookHolder.at(i).customerList.at(j).borrowDay, today) - bookHolder.at(i).getBorrowDate()) > 0) {
+										cout << " (late for " << (dayCounter(bookHolder.at(i).customerList.at(j).borrowDay, today) - bookHolder.at(i).getBorrowDate())
 										<< " day(s))\n";
-										cout << "Sent email to " << bookHolder.at(i)->customerList.at(j).customerMail << "\n";
+										cout << "Sent email to " << bookHolder.at(i).customerList.at(j).customerMail << "\n";
 									}
 									else cout << "\n";
 								}
@@ -155,13 +155,13 @@ int main() {
 				case 7: {
 					idInputChecker(bookHolder, inputString);				
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						if (bookHolder.at(i)->getID() == inputString) {
+						if (bookHolder.at(i).getID() == inputString) {
 							while(true) {
 								cout << "Please enter number of book you want to report: ";
 								cin >> inputNumber;
 								cin.ignore();
-								if (bookHolder.at(i)->getQuantity() >= inputNumber) {
-									bookHolder.at(i)->changeQuantity(-inputNumber);
+								if (bookHolder.at(i).getQuantity() >= inputNumber) {
+									bookHolder.at(i).changeQuantity(-inputNumber);
 									cout << "Reported successfully " << inputNumber << " book(s)";
 									break;
 								}
@@ -207,8 +207,8 @@ int main() {
 					cout << "Here are the book titles\' list\n";
 					cout << "===================\n";
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						cout << "\"" << bookHolder.at(i)->getTitle() << "\" by " << bookHolder.at(i)->getAuthor()
-						<< " with " << bookHolder.at(i)->getQuantity() << " books.\n";
+						cout << "\"" << bookHolder.at(i).getTitle() << "\" by " << bookHolder.at(i).getAuthor()
+						<< " with " << bookHolder.at(i).getQuantity() << " books.\n";
 					}
 					cout << "==================\n";
 					break;
@@ -261,21 +261,21 @@ int main() {
 
 					cout << "The book(s) you want to search for are:\n";
 					for (int i = 0; i < (int) foundedBook.size(); i++) {
-						cout << "\"" << foundedBook.at(i)->getTitle() << "\" by " << foundedBook.at(i)->getAuthor() << " with " << foundedBook.at(i)->getQuantity()
-						<< " books in level \'" << foundedBook.at(i)->getLevel() << "\' and zone \'" << foundedBook.at(i)->getZone() << "\'!\n"; 
+						cout << "\"" << foundedBook.at(i).getTitle() << "\" by " << foundedBook.at(i).getAuthor() << " with " << foundedBook.at(i).getQuantity()
+						<< " books in level \'" << foundedBook.at(i).getLevel() << "\' and zone \'" << foundedBook.at(i).getZone() << "\'!\n"; 
 					}
 					break;	
 				}
 				case 3:{
 					idInputChecker(bookHolder, inputString);				
 					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						if (bookHolder.at(i)->getID() == inputString) {
+						if (bookHolder.at(i).getID() == inputString) {
 							while(true) {
 								cout << "Please enter number of book you want to report: ";
 								cin >> inputNumber;
 								cin.ignore();
-								if (bookHolder.at(i)->getQuantity() >= inputNumber) {
-									bookHolder.at(i)->changeQuantity(-inputNumber);
+								if (bookHolder.at(i).getQuantity() >= inputNumber) {
+									bookHolder.at(i).changeQuantity(-inputNumber);
 									cout << "Reported successfully " << inputNumber << " book(s)";
 									break;
 								}

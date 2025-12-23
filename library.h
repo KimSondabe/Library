@@ -95,15 +95,15 @@ class Account{
 };
 
 // books.cpp
-void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Read data from file
-void Write(const string filename, vector<Books*> &bookHolder); // Write data to file
-void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Write data to file (overload)
-void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string str, const int choice); // Find book by title/author
-void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string title, const string author); // Find book by title & author
-void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Add book(s)
-void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
-void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
-void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook);
+void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Read data from file
+void Write(const string filename, vector<Books> &bookHolder); // Write data to file
+void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Write data to file (overload)
+void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string str, const int choice); // Find book by title/author
+void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string title, const string author); // Find book by title & author
+void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Add book(s)
+void Borrow(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
+void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
+void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook);
 
 // account.cpp
 bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
@@ -118,7 +118,7 @@ void DisplayAcc(vector<Account> &Acc); //Display Acc
 string lowerCase(string str); // Convert string to lower case
 bool capitalizeWords(string &s); // Capitalize first letter of each word
 string idCounter(string prevID); // Generate next ID
-void idInputChecker(vector<Books*> &bookHolder, string &inputString); // Check valid book ID input
+void idInputChecker(vector<Books> &bookHolder, string &inputString); // Check valid book ID input
 bool isLeap(int year); // Check leap year
 int daysInMonth(int month, int year); // Check number of days in month
 bool dayFormatCheck(string &str); // Check if user has inserted the right dd/mm/yyyy format and normalize
@@ -128,6 +128,6 @@ bool customerIDchecker(string &customerID); // Check valid customer ID input
 void adminMenu();//UI Admin's Menu
 void userMenu();//UI User's Menu
 int getChoice(int &choice);//get userchoice
-void Exit(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc);//Exit
+void Exit(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc);//Exit
 
 #endif 

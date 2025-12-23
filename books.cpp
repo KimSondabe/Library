@@ -1,14 +1,10 @@
 #include "library.h"
 
-void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
 	string buffer, bookInfoList[7], borrowedInfoList[5], accountList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	vector<customerInfo> customerList;
-	
-    for (Books* b : bookHolder) {
-        delete b;
-    }
 	bookHolder.clear();
 	borrowedHolder.clear();
 	Acc.clear();
@@ -75,14 +71,14 @@ void ReadFile(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHold
 					customerList.push_back(borrowedHolder.at(i).info);
 				}
 			}
-			Books* book = new Books(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
+			Books book(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
 			bookHolder.push_back(book);           
 		}
 	}
 	file.close();
 }
 
-void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
     for(auto x : setID) {
         cout<<x<<" ";
     }
@@ -119,24 +115,24 @@ void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unorder
         string level;
         cout<<"Level: ";
         getline(cin, level);
-        bookHolder[indexOfID]->setZone(zone);
-        bookHolder[indexOfID]->setLevel(level);
+        bookHolder[indexOfID].setZone(zone);
+        bookHolder[indexOfID].setLevel(level);
     }
 }
 
-void Write(const string filename, vector<Books*> &bookHolder) { 
+void Write(const string filename, vector<Books> &bookHolder) { 
 	ofstream output("txt/" + filename);
 	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		output << bookHolder.at(i)->getID() << "|" << bookHolder.at(i)->getTitle() << "|" 
-		<< bookHolder.at(i)->getAuthor() << "|" << bookHolder.at(i)->getQuantity() << "|"
-		<< bookHolder.at(i)->getPages() << "|" << bookHolder.at(i)->getLevel() << "|"
-		<< bookHolder.at(i)->getZone() << "|\n";
+		output << bookHolder.at(i).getID() << "|" << bookHolder.at(i).getTitle() << "|" 
+		<< bookHolder.at(i).getAuthor() << "|" << bookHolder.at(i).getQuantity() << "|"
+		<< bookHolder.at(i).getPages() << "|" << bookHolder.at(i).getLevel() << "|"
+		<< bookHolder.at(i).getZone() << "|\n";
 	}	
 	output.close();
 	cout << "===== Wrote to \"" << filename << "\" =====\n";
 }
 
-void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
+void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
 	Write(filename, bookHolder);
 	// Write borrowed books file
 	ofstream output("txt/borrowedBooks.txt");
@@ -150,20 +146,20 @@ void Write(const string filename, vector<Books*> &bookHolder, vector<BorrowedBoo
 	cout << "===== Wrote to \"borrowedBooks.txt\" =====\n";
 }
 
-void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string str, const int choice) {
+void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string str, const int choice) {
 	
 	// Check for same title/author in original vector -> push to vector "foundedBook"
 	foundedBook.clear();
 	if (choice == 1) {
 		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if (lowerCase(bookHolder.at(i)->getTitle()).find(lowerCase(str)) != string::npos) {
+			if (lowerCase(bookHolder.at(i).getTitle()).find(lowerCase(str)) != string::npos) {
 				foundedBook.push_back(bookHolder.at(i));
 			}
 		}
 	}
 	else if (choice == 2) {
 		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if(lowerCase(bookHolder.at(i)->getAuthor()).find(lowerCase(str)) != string::npos){
+			if(lowerCase(bookHolder.at(i).getAuthor()).find(lowerCase(str)) != string::npos){
 				foundedBook.push_back(bookHolder.at(i));
 			} 
 		}
@@ -171,17 +167,17 @@ void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string 
 
 }
 
-void Find(vector<Books*> &bookHolder, vector<Books*> &foundedBook, const string title, const string author) {
+void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string title, const string author) {
 	foundedBook.clear();
 	for (int i = 0; i < (int) bookHolder.size(); i++){
-			if((lowerCase(bookHolder.at(i)->getAuthor()).find(lowerCase(author)) != string::npos)
-			&& (lowerCase(bookHolder.at(i)->getTitle()).find(lowerCase(title)) != string::npos)){
+			if((lowerCase(bookHolder.at(i).getAuthor()).find(lowerCase(author)) != string::npos)
+			&& (lowerCase(bookHolder.at(i).getTitle()).find(lowerCase(title)) != string::npos)){
 				foundedBook.push_back(bookHolder.at(i));
 		} 
 	}
 }
 
-void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
     string id, title, author, zone;
 	int quantity, level, page;
 	// Checking book's title and author
@@ -201,8 +197,8 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook, unordered_set<
 		if ((quantity > 0) && (quantity < 999)) {
 			if (!foundedBook.empty()) { // If there is a book in vector "foundedBook"
 				for (int i = 0; i < (int) bookHolder.size(); i++){
-					if ((bookHolder.at(i)->getID() == foundedBook.front()->getID())) {
-						bookHolder.at(i)->changeQuantity(quantity);
+					if ((bookHolder.at(i).getID() == foundedBook.front().getID())) {
+						bookHolder.at(i).changeQuantity(quantity);
 						cout << "===== Added " << quantity << " book(s) successfully! =====\n";
 						break;
 					}
@@ -236,24 +232,24 @@ void Add(vector<Books*> &bookHolder, vector<Books*> &foundedBook, unordered_set<
 	if (bookHolder.empty()) {
 		id = "0001";
 	} else {
-		id = idCounter(bookHolder.back()->getID());
+		id = idCounter(bookHolder.back().getID());
 	}
     setID.insert(id);
 	vector<customerInfo> customerList;
-	Books* book = new Books(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
+	Books book(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);
 	cout << "\n===== Added Book successfully =====\n";
 }
 
-void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
+void Borrow(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
 	idInputChecker(bookHolder, inputString);
 	string buffer;
 	vector<string> customerIDlist;
     
 	// Find the book in bookHolder
 	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		if (bookHolder.at(i)->getID() == inputString) {
-			if (bookHolder.at(i)->getQuantity() == 0) {
+		if (bookHolder.at(i).getID() == inputString) {
+			if (bookHolder.at(i).getQuantity() == 0) {
 				cout << "Sorry, this book is out of stock!\n";
 				return;
 			}
@@ -273,8 +269,8 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 			newCustomer.customerID = buffer;
 			newCustomer.borrowDay = today;
 			// Check if customer has already borrowed this book
-			for (int j = 0; j < (int) bookHolder.at(i)->customerList.size(); j++) {
-				if (bookHolder.at(i)->customerList.at(j).name == newCustomer.name && bookHolder.at(i)->customerList.at(j).customerID == newCustomer.customerID) {
+			for (int j = 0; j < (int) bookHolder.at(i).customerList.size(); j++) {
+				if (bookHolder.at(i).customerList.at(j).name == newCustomer.name && bookHolder.at(i).customerList.at(j).customerID == newCustomer.customerID) {
 					cout << "You have already borrowed this book!\n";
 					return;
 				}
@@ -285,13 +281,13 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 				if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
 			} while (true);
 			newCustomer.customerMail = buffer;
-			bookHolder.at(i)->customerList.push_back(newCustomer);
+			bookHolder.at(i).customerList.push_back(newCustomer);
 			// Ask for quantity to borrow
 			do {
-				cout << "There are " << bookHolder.at(i)->getQuantity() << " book(s) available.\n";
+				cout << "There are " << bookHolder.at(i).getQuantity() << " book(s) available.\n";
 				cout << "Enter number of book(s) you want to borrow: ";
 				cin >> buffer;
-				if ((stoi(buffer) > 0) && (stoi(buffer) <= bookHolder.at(i)->getQuantity())) {
+				if ((stoi(buffer) > 0) && (stoi(buffer) <= bookHolder.at(i).getQuantity())) {
 					break;
 				}
 				cout << "Invalid input, please try again.\n";
@@ -303,15 +299,15 @@ void Borrow(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 			borrowedBook.info = newCustomer;
 			borrowedBook.borrowQuantity = buffer;
 			borrowedHolder.push_back(borrowedBook);
-			bookHolder.at(i)->changeQuantity(-stoi(buffer));
+			bookHolder.at(i).changeQuantity(-stoi(buffer));
 			cout << "===== Book(s) borrowed successfully! =====\n";
-			cout << "You must return on " << borrowDateCalculate(today, bookHolder.at(i)->getBorrowDate()) << "\n";
+			cout << "You must return on " << borrowDateCalculate(today, bookHolder.at(i).getBorrowDate()) << "\n";
 			return;
 		}
 	}
 }
 
-void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
+void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
 	idInputChecker(bookHolder, inputString);
 	string buffer;
 	vector<customerInfo> customerlist;
@@ -343,13 +339,13 @@ void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 			borrowedHolder.erase(borrowedHolder.begin() + i);
 			// Increase book quantity in bookHolder and update customer list
 			for (int j = 0; j < (int) bookHolder.size(); j++) {
-				if (bookHolder.at(j)->getID() == inputString) {
+				if (bookHolder.at(j).getID() == inputString) {
 					// Calculate late days
 					int lateDays = 0;
-					lateDays = dayCounter(borrowed.info.borrowDay, today) - bookHolder.at(j)->getBorrowDate();
+					lateDays = dayCounter(borrowed.info.borrowDay, today) - bookHolder.at(j).getBorrowDate();
 					if (lateDays > 0) {
 						cout << "You are late by " << lateDays << " day(s). Please pay fine of " 
-						<< lateDays * bookHolder.at(j)->getPages() * stoi(borrowed.borrowQuantity) 
+						<< lateDays * bookHolder.at(j).getPages() * stoi(borrowed.borrowQuantity) 
 						<< " VND.\n";
 						cout << "Press Enter to confirm payment...";
 						cin.get();
@@ -357,11 +353,11 @@ void Return(vector<Books*> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder
 					else {
 						cout << "Thank you for returning on time!\n";
 					}
-					bookHolder.at(j)->changeQuantity(stoi(borrowed.borrowQuantity));
-					int originalCustomerListSize = (int) bookHolder.at(j)->customerList.size();
+					bookHolder.at(j).changeQuantity(stoi(borrowed.borrowQuantity));
+					int originalCustomerListSize = (int) bookHolder.at(j).customerList.size();
 					for (int k = 0; k < originalCustomerListSize; k++) {
-						if (bookHolder.at(j)->customerList.at(k).name == returnCustomer.name && bookHolder.at(j)->customerList.at(k).customerID == returnCustomer.customerID) {
-							bookHolder.at(j)->customerList.erase(bookHolder.at(j)->customerList.begin() + k);
+						if (bookHolder.at(j).customerList.at(k).name == returnCustomer.name && bookHolder.at(j).customerList.at(k).customerID == returnCustomer.customerID) {
+							bookHolder.at(j).customerList.erase(bookHolder.at(j).customerList.begin() + k);
 							break;
 						}
 					}
