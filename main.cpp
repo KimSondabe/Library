@@ -267,14 +267,38 @@ int main() {
 					break;	
 				}
 				case 3:{
-					Borrow(bookHolder, borrowedHolder, today, inputString);
+					idInputChecker(bookHolder, inputString);				
+					for (int i = 0; i < (int) bookHolder.size(); i++) {
+						if (bookHolder.at(i)->getID() == inputString) {
+							while(true) {
+								cout << "Please enter number of book you want to report: ";
+								cin >> inputNumber;
+								cin.ignore();
+								if (bookHolder.at(i)->getQuantity() >= inputNumber) {
+									bookHolder.at(i)->changeQuantity(-inputNumber);
+									cout << "Reported successfully " << inputNumber << " book(s)";
+									break;
+								}
+								cout << "Invalid input, please try again.\n";
+							}
+							break;
+						}
+					}
 					break;
 				}
 				case 4:{
-					Return(bookHolder, borrowedHolder, today, inputString);
+					Borrow(bookHolder, borrowedHolder, today, inputString);
 					break;
 				}
 				case 5:{
+					Return(bookHolder, borrowedHolder, today, inputString);
+					break;
+				}
+				case 6:{
+
+					break;
+				}
+				case 7:{
 					Exit(bookHolder,borrowedHolder,Acc);
 					status = false;
 					break;

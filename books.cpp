@@ -86,16 +86,17 @@ void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unorder
     for(auto x : setID) {
         cout<<x<<" ";
     }
+	cout << "\n";
     bool validMode = false;
     string mode;
     while(!validMode) {
         cout << "Move books by ID or Name: ";
         getline(cin,mode);
-        cout<<"\n";
+        //cout<<"\n";
         if(mode == "ID" || mode == "Name") {
             validMode = true;
         }else {
-            cout << "Invalid mode \n ";
+            cout << "Invalid mode \n";
         }
     }
     if(mode == "ID") {
@@ -114,7 +115,7 @@ void MoveBooks(vector<Books*> &bookHolder, unordered_set<string> &setID, unorder
         string zone;
         cout<<"Zone: ";
         getline(cin, zone);
-        cout<<"\n";
+        //cout<<"\n";
         string level;
         cout<<"Level: ";
         getline(cin, level);

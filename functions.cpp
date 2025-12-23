@@ -277,9 +277,11 @@ void userMenu(){
 	cout << "============== Library ==============\n";
 	cout << "|1. View all books                  |\n"; // Done
 	cout << "|2. Find book                       |\n"; // Done
-	cout << "|3. Borrow book (s)                 |\n"; // Done
-	cout << "|4. Return book (s)                 |\n"; // Done
-	cout << "|5. Exit                            |\n"; // Done
+    cout << "|3. Report book's issue             |\n"; // Done
+	cout << "|4. Borrow book (s)                 |\n"; // Done
+	cout << "|5. Return book (s)                 |\n"; // Done
+    cout << "|6. Profile                         |\n"; // Done
+	cout << "|7. Exit                            |\n"; // Done
 	cout << "=====================================\n";
 }
 

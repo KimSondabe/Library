@@ -69,3 +69,4 @@ void DisplayAcc(vector<Account> &Acc){
 		cout << Acc.at(i).getIndex() << "|" << Acc.at(i).getUser() << "|" << Acc.at(i).getPass() <<"|"<< Acc.at(i).getRole() << "|\n";
 	}
 }
+
