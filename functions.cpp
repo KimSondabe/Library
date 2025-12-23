@@ -53,7 +53,7 @@ string idCounter(string prevID) {
     return upComingID;
 }
 
-void idInputChecker(vector<Books*> &bookHolder, string &inputString) {
+void idInputChecker(vector<Books> &bookHolder, string &inputString) {
 	do {
 		cout << "Please enter the book(s) ID you want to find (xxxx): ";
 		cin >> inputString;
@@ -66,7 +66,7 @@ void idInputChecker(vector<Books*> &bookHolder, string &inputString) {
 		}
 		bool found = false;
 		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if (bookHolder.at(i)->getID() == inputString) {
+			if (bookHolder.at(i).getID() == inputString) {
 				found = true;
 				break;
 			}

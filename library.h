@@ -95,12 +95,12 @@ class Account{
 };
 
 // books.cpp
-void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Read data from file
+void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex); // Read data from file
 void Write(const string filename, vector<Books> &bookHolder); // Write data to file
 void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Write data to file (overload)
 void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string str, const int choice); // Find book by title/author
 void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string title, const string author); // Find book by title & author
-void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook); // Add book(s)
+void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex); // Add book(s)
 void Borrow(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
 void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
 void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook);

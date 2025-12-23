@@ -14,6 +14,7 @@ int main() {
 	vector<Account> Acc;
     unordered_set<string> setID;
     unordered_map<string,int> indexOfBook;
+    int bookIndex = 0; // index of book by name in vector bookHolder
     
 	// Entrance interface (login, date input, file read)
 	cout << "Today is: ";
@@ -22,7 +23,7 @@ int main() {
 		if (dayFormatCheck(today)) break;
 		cout << "Invalid date format, please try again (dd/mm/yyyy): ";
 	} while(true);
-	ReadFile(bookHolder, borrowedHolder, Acc, setID, indexOfBook);
+	ReadFile(bookHolder, borrowedHolder, Acc, setID, indexOfBook, bookIndex);
 	do {
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
@@ -174,7 +175,7 @@ int main() {
 				}
 
 				case 8: {
-					Add(bookHolder, foundedBook, setID, indexOfBook);
+					Add(bookHolder, foundedBook, setID, indexOfBook, bookIndex);
 					break;
 				}
 

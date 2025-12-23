@@ -1,6 +1,6 @@
 #include "library.h"
 
-void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex) {
 	string buffer, bookInfoList[7], borrowedInfoList[5], accountList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
@@ -65,6 +65,8 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
 		}
 		if (bookInfoList[0] != "") {
             setID.insert(bookInfoList[0]);
+            indexOfBook[bookInfoList[1]] = bookIndex;
+            bookIndex++;
 			for (int i = 0; i < (int) borrowedHolder.size(); i++){
 				if (borrowedHolder.at(i).bookID == bookInfoList[0]) { 
 					// Store customer infomation into a vector
@@ -79,10 +81,6 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
 }
 
 void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
-    for(auto x : setID) {
-        cout<<x<<" ";
-    }
-	cout << "\n";
     bool validMode = false;
     string mode;
     while(!validMode) {
@@ -117,6 +115,30 @@ void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordere
         getline(cin, level);
         bookHolder[indexOfID].setZone(zone);
         bookHolder[indexOfID].setLevel(level);
+        cout << "Moved  books";
+    }
+    if(mode == "Name") {
+        string name;
+        bool validName = false;
+        while(!validName) {
+            cout << "Name: ";
+            getline(cin, name);
+            if(indexOfBook.find(name) != indexOfBook.end()) {
+                validName = true;
+            }else {
+                cout << "Invalid name \n";
+            }
+        }
+        string zone;
+        cout << "Zone: ";
+        getline(cin, zone);
+        string level;
+        cout << "Level: ";
+        getline(cin, level);
+        int i = indexOfBook[name];
+        bookHolder[i].setLevel(level);
+        bookHolder[i].setZone(zone);
+        cout << "Moved books";
     }
 }
 
@@ -177,7 +199,7 @@ void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string ti
 	}
 }
 
-void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
+void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex) {
     string id, title, author, zone;
 	int quantity, level, page;
 	// Checking book's title and author
@@ -238,6 +260,8 @@ void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<st
 	vector<customerInfo> customerList;
 	Books book(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
 	bookHolder.push_back(book);
+    indexOfBook[title] = bookIndex;
+    bookIndex++;
 	cout << "\n===== Added Book successfully =====\n";
 }
 
