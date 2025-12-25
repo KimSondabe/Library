@@ -176,9 +176,7 @@ void Exit(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, v
 int main() {
     // Variables Declaration (If need more, declare in specific functions)
     bool status = true;
-	int quantitiesSum = 0;
     int choice;
-    int inputNumber;
 	string inputString, today;
 	string username, password;
     vector<Books> bookHolder;
@@ -534,7 +532,7 @@ void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBook
 }
 
 void CountBooks(vector<Books> &bookHolder){
-	int quantitiesSum;
+	int quantitiesSum = 0;
 
 	for (int i = 0; i < (int) bookHolder.size(); i++) {
 		quantitiesSum += bookHolder.at(i).getQuantity();
