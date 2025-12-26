@@ -41,8 +41,25 @@ class LibraryItems {
 		/* ======== Getters ========*/
 
 		/* ======== Setters ========*/
-		void setLevel(string level) {this->level = level;}
-		void setZone(string zone) {this->zone = zone;}
+		void Move() {
+			string level, zone;
+			while(true) {
+				level = getIntInput("Enter Level (1-5): ");
+				if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
+				cout << "Invalid input, please try again\n";
+			}
+
+			while(true) {
+				cout << "Enter Zone (A-E): ";
+				getline(cin, zone);
+				if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+				cout << "Invalid input, please try again.\n";
+			}
+
+			this->zone = zone;
+			this->level = level;
+			cout << "Moved successfully!\n";
+		}
 		/* ======== Setters ========*/
 };
 
@@ -153,9 +170,10 @@ void ViewBooks(Library &lib); // View book(s)
 void Add(Library &lib); // Add book(s)
 void Borrow(Library &lib); // Borrow book(s)
 void Return(Library &lib); // Return book(s)
-void MoveBooks(Library &lib); // Move book(s)
+void MoveItem(Library &lib, const string itemType); // Move item(s)
 void FindBooks(Library &lib); //Feature Find
-void ReportBooks(Library &lib);//Report books' issues
+void ReportBooks(Library &lib); //Report books' issues
+void viewBorrowedUsers(Library &lib); // View users who borrowed a specific book
 
 // Account Main Function
 bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
@@ -189,8 +207,6 @@ string getIntInput(string str); //Get user input
 int main() {
     // Variables Declaration (If need more, declare in specific functions)
     bool status = true;
-    int choice;
-	string inputString;
 	string username, password;
 	Library lib;
     
@@ -261,24 +277,7 @@ int main() {
 				}
 				
 				case 6: {
-					idInputChecker(lib.bookHolder, inputString);
-					if (lib.bookHolder[inputString].customerList.empty()) {
-						cout << "There are no customer whom borrowed this book!\n";
-					}
-					else {
-						cout << "They are:\n";
-						for (int i = 0; i < (int) lib.bookHolder[inputString].customerList.size(); i++) {
-							cout << "- \"" << lib.bookHolder[inputString].customerList[i].name << "\" with ID: \'" 
-							<< lib.bookHolder[inputString].customerList[i].customerID 
-							<< "\' and borrowed in " << lib.bookHolder[inputString].customerList[i].borrowDay;
-							if ((dayCounter(lib.bookHolder[inputString].customerList[i].borrowDay, lib.today) - lib.bookHolder[inputString].getBorrowDate()) > 0) {
-								cout << " (late for " << (dayCounter(lib.bookHolder[inputString].customerList[i].borrowDay, lib.today) - lib.bookHolder[inputString].getBorrowDate())
-								<< " day(s))\n";
-								cout << "Sent email to " << lib.bookHolder[inputString].customerList[i].customerMail << "\n";
-							}
-							else cout << "\n";
-						}
-					}
+					viewBorrowedUsers(lib);
 					break;
 				}
 				case 7: {
@@ -292,7 +291,7 @@ int main() {
 				}
 
 				case 9: {
-					MoveBooks(lib);
+					MoveItem(lib, "Book");
 					break;
 				}
 
@@ -314,7 +313,7 @@ int main() {
         	}
 		}
 
-		else{
+		else {
 			userMenu();
 			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1:{
@@ -348,7 +347,7 @@ int main() {
 					break;
 				}
 				case 6:{
-
+					// This feature is under development
 					break;
 				}
 				case 7:{
@@ -447,26 +446,15 @@ void ReadFile(Library &lib) {
 	file.close();
 }
 
-void MoveBooks(Library &lib) {
-	string bookID, level, zone;
-    idInputChecker(lib.bookHolder, bookID);
-
-	while(true) {
-		level = getIntInput("Enter Book's Level (1-5): ");
-		if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
-		cout << "Invalid input, please try again\n";
+void MoveItem(Library &lib, const string itemType) {
+	if (itemType == "Book") {	
+		string bookID;
+		idInputChecker(lib.bookHolder, bookID);
+		lib.bookHolder[bookID].Move();
 	}
-
-	while(true) {
-		cout << "Enter Book's Zone (A-E): ";
-		getline(cin, zone);
-		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-		cout << "Invalid input, please try again.\n";
+	else if (itemType == "Computer") {
+		// Move computer function (To be implemented if needed)
 	}
-
-	lib.bookHolder[bookID].setZone(zone);
-	lib.bookHolder[bookID].setLevel(level);
-	cout << "Moved books successfully!\n";
 }
 
 void Write(Library &lib, bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers) {
@@ -646,6 +634,27 @@ void Add(Library &lib) {
 	lib.bookHolder[id] = book;
 
 	cout << "\n===== Added Book successfully =====\n";
+}
+
+void viewBorrowedUsers(Library &lib) {
+	string bookID;
+	idInputChecker(lib.bookHolder, bookID);
+	if (lib.bookHolder[bookID].customerList.empty()) {
+		cout << "There are no customer whom borrowed this book!\n";
+	}
+	else {
+		cout << "They are:\n";
+		for (int i = 0; i < (int) lib.bookHolder[bookID].customerList.size(); i++) {
+			cout << "- Name: \"" << lib.bookHolder[bookID].customerList[i].name 
+			<< "\"\n - ID: \'" << lib.bookHolder[bookID].customerList[i].customerID 
+			<< "\'\n - Borrowed on: " << lib.bookHolder[bookID].customerList[i].borrowDay;
+			if ((dayCounter(lib.bookHolder[bookID].customerList[i].borrowDay, lib.today) - lib.bookHolder[bookID].getBorrowDate()) > 0) {
+				cout << " (late for " << (dayCounter(lib.bookHolder[bookID].customerList[i].borrowDay, lib.today) - lib.bookHolder[bookID].getBorrowDate())
+				<< " day(s))\n" << "Sent email to " << lib.bookHolder[bookID].customerList[i].customerMail << "\n";
+			}
+			else cout << "\n";
+		}
+	}
 }
 
 void Borrow(Library &lib) {
