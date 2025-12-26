@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <unordered_set>
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -24,17 +23,19 @@ typedef struct {
 
 class LibraryItems {
 	private:
-		string id;
 		string level;
 		string zone;
 	public:
+		/* ======== Default Constructor ======== */
+		LibraryItems() : level("0"), zone("A") {}
+		/* ======== Default Constructor ======== */
+
 		/* ======== Constructor ======== */
-		LibraryItems(string id, string level, string zone)
-		: id(id), level(level), zone(zone) {}
+		LibraryItems(string level, string zone)
+		: level(level), zone(zone) {}
 		/* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
-		string getID() {return id;}
 		int getLevel() {return stoi(level);}
 		string getZone() {return zone;}
 		/* ======== Getters ========*/
@@ -54,9 +55,14 @@ class Books : public LibraryItems {
 	public :
 		vector<customerInfo> customerList;
 
+		/* ======== Default Constructor ======== */
+		Books()
+		: LibraryItems(), title(""), author(""), quantity("0"), page("0"), customerList({}) {}
+		/* ======== Default Constructor ======== */
+
         /* ======== Constructor ======== */
-		Books(string id, string title, string author, string quantity, string page, string level, string zone, vector<customerInfo> customerList)
-        : LibraryItems(id, level, zone), title(title), author(author), quantity(quantity), page(page), customerList(customerList) {}
+		Books(string title, string author, string quantity, string page, string level, string zone, vector<customerInfo> customerList)
+        : LibraryItems(level, zone), title(title), author(author), quantity(quantity), page(page), customerList(customerList) {}
 		/* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
@@ -79,9 +85,13 @@ class Computers : public LibraryItems {
 	private:
 		string specs;
 	public:
+		/* ======== Default Constructor ======== */
+		Computers() : LibraryItems(), specs("") {}
+		/* ======== Default Constructor ======== */
+
 		/* ======== Constructor ======== */
-		Computers(string id, string level, string zone, string specs)
-		: LibraryItems(id, level, zone), specs(specs) {}
+		Computers(string level, string zone, string specs)
+		: LibraryItems(level, zone), specs(specs) {}
 		/* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
@@ -108,43 +118,50 @@ class Account{
         /* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
-		string getUser(){return username;}
-		string getPass(){return password;}
-		string getRole(){return role;}
-		string getIndex(){return index;}
+		string getUser() {return username;}
+		string getPass() {return password;}
+		string getRole() {return role;}
+		string getIndex() {return index;}
 		/* ======== Getters ========*/
 		
 		/* ======== Setters ========*/
-		void setUser(string user){username = user;}
-		void setPass(string pass){password = pass;}
-		void setAdmin(string r){role = role;}
-		void setIndex(int i){index = i;}
+		void setUser(string user) {username = user;}
+		void setPass(string pass) {password = pass;}
+		void setAdmin(string r) {role = r;}
+		void setIndex(int i) {index = i;}
 		/* ======== Setters ========*/
 
 };
-/*=======Declear Function=======*/
+typedef struct {
+	map<string, Books> bookHolder;
+	map<string, Books> foundedBook;
+	vector<BorrowedBookInfo> borrowedHolder;
+	vector<Account> Acc;
+	string today;
+} Library;
 
-// Books Main Function
-void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex); // Read data from file
-void Write(const string filename, vector<Books> &bookHolder); // Write data to file
-void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder); // Write data to file (overload)
-void CountBooks(vector<Books> &bookHolder);//Count books
-void ViewBooks(vector<Books> &bookHolder);//View all books
-void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string str, const int choice); // Find book by title/author
-void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string title, const string author); // Find book by title & author
-void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex); // Add book(s)
-void Borrow(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Borrow book(s)
-void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString); // Return book(s)
-void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook);
-void FindBooks(vector<Books> &bookHolder, vector<Books> &foundedBook); //Feature Find
-void ReportBooks(vector<Books> &bookHolder);//Report books' issues
+/*======= Declare Function =======*/
+
+// File working functions
+void ReadFile(Library &lib); // Read data from file
+void Write(Library &lib,bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers); // Write data to file
+
+// Book Main Functions
+void Find(Library &lib, const string title, const string author, const string choice); // Find book by title/author
+void CountBooks(Library &lib); // Count total books
+void ViewBooks(Library &lib); // View book(s)
+void Add(Library &lib); // Add book(s)
+void Borrow(Library &lib); // Borrow book(s)
+void Return(Library &lib); // Return book(s)
+void MoveBooks(Library &lib); // Move book(s)
+void FindBooks(Library &lib); //Feature Find
+void ReportBooks(Library &lib);//Report books' issues
 
 // Account Main Function
 bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
 bool CheckUser(vector<Account> &Acc, string username); //Check if username existed
 string getIndexAcc(vector<Account> &Acc, string &username, string &password); //Get account index
 bool isAdmin(vector<Account> &Acc, string index); //Check if the account is a admin
-void Write(vector<Account> &Acc); //Write accounts to file
 void CreateAcc(vector<Account> &Acc); // Create Acc
 void DisplayAcc(vector<Account> &Acc); //Display Acc
 
@@ -161,144 +178,132 @@ string borrowDateCalculate(string start, int borrowDuration); // Calculate retur
 //Book Function
 bool customerIDchecker(string &customerID); // Check valid customer ID input
 string idCounter(string prevID); // Generate next ID
-void idInputChecker(vector<Books> &bookHolder, string &inputString); // Check valid book ID input
+void idInputChecker(map<string, Books> &bookHolder, string &inputString); // Check valid book ID input
 
 //UI Function
 void adminMenu();//UI Admin's Menu
 void userMenu();//UI User's Menu
 int getChoice(int &choice);//get userchoice
-void Exit(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc);//Exit
-
-
-
 
 /*========MAIN PROGRAM=======*/
 int main() {
     // Variables Declaration (If need more, declare in specific functions)
     bool status = true;
     int choice;
-	string inputString, today;
+	string inputString;
 	string username, password;
-    vector<Books> bookHolder;
-	vector<Books> foundedBook;
-	vector<BorrowedBookInfo> borrowedHolder;
-	vector<Account> Acc;
-    unordered_set<string> setID;
-    unordered_map<string,int> indexOfBook;
-    int bookIndex = 0; // index of book by name in vector bookHolder
+	Library lib;
     
 	// Today's date
 	cout << "Today is: ";
 	time_t now = time(0);
 	ctime(&now);
 	tm *ltm = localtime(&now);
-	today = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
-	cout << today << "\n";
+	lib.today = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
+	cout << lib.today << "\n";
 
 	// Read data from file
-	ReadFile(bookHolder, borrowedHolder, Acc, setID, indexOfBook, bookIndex);
+	ReadFile(lib);
 	
 	// Login interface
 	do {
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
-		if(CheckPass(Acc, username, password)){
+		if(CheckPass(lib.Acc, username, password)) {
 			cout << "Successfully!\n";
 			break;
-		}else{
+		}
+		else{
 			cout << "Wrong username or password, please try again\n";
-			}
+		}
 	} while(true);
 
 	// Main interface
 	status = true;
     while(status) {
-		if(isAdmin(Acc, getIndexAcc(Acc, username, password))){
+		if(isAdmin(lib.Acc, getIndexAcc(lib.Acc, username, password))) {
 			adminMenu();
 			getChoice(choice);
 
 			switch(choice) {
 				case 1: { 
-					CountBooks(bookHolder);
+					CountBooks(lib);
 					break;
 				}
 
 				case 2: {
-					Write("booksCopy.txt", bookHolder);
+					Write(lib, false, true, false, false, false);
 					break;
 				}
 
 				case 3: {
-					ViewBooks(bookHolder);
+					ViewBooks(lib);
 					break;
 				}
 
 				case 4: {
-					DisplayAcc(Acc);
+					DisplayAcc(lib.Acc);
 					break;
 				}
 
 				case 5: {
-					FindBooks(bookHolder,foundedBook);
-					if (foundedBook.empty()) {
+					FindBooks(lib);
+					if (lib.foundedBook.empty()) {
 						cout << "There are no book match with your search!\n";
 						break;
 					}
 					cout << "The book(s) you want to search for are:\n";
-					for (int i = 0; i < (int) foundedBook.size(); i++) {
-						cout << "\"" << foundedBook.at(i).getTitle() << "\" by " << foundedBook.at(i).getAuthor() << " with " << foundedBook.at(i).getQuantity()
-						<< " books in level \'" << foundedBook.at(i).getLevel() << "\' and zone \'" << foundedBook.at(i).getZone() << "\'!\n"; 
+					for (auto i : lib.foundedBook) {
+						cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
+						<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
 					}
 					break;
 				}
 				
 				case 6: {
-					idInputChecker(bookHolder, inputString);
-					for (int i = 0; i < (int) bookHolder.size(); i++) {
-						if (bookHolder.at(i).getID() == inputString) {
-							if (bookHolder.at(i).customerList.empty()) {
-								cout << "There are no customer whom borrowed this book!\n";
+					idInputChecker(lib.bookHolder, inputString);
+					if (lib.bookHolder[inputString].customerList.empty()) {
+						cout << "There are no customer whom borrowed this book!\n";
+					}
+					else {
+						cout << "They are:\n";
+						for (int i = 0; i < (int) lib.bookHolder[inputString].customerList.size(); i++) {
+							cout << "- \"" << lib.bookHolder[inputString].customerList[i].name << "\" with ID: \'" 
+							<< lib.bookHolder[inputString].customerList[i].customerID 
+							<< "\' and borrowed in " << lib.bookHolder[inputString].customerList[i].borrowDay;
+							if ((dayCounter(lib.bookHolder[inputString].customerList[i].borrowDay, lib.today) - lib.bookHolder[inputString].getBorrowDate()) > 0) {
+								cout << " (late for " << (dayCounter(lib.bookHolder[inputString].customerList[i].borrowDay, lib.today) - lib.bookHolder[inputString].getBorrowDate())
+								<< " day(s))\n";
+								cout << "Sent email to " << lib.bookHolder[inputString].customerList[i].customerMail << "\n";
 							}
-							else {
-								cout << "They are:\n";
-								for (int j = 0; j < (int) bookHolder.at(i).customerList.size(); j++) {
-									cout << "- \"" << bookHolder.at(i).customerList.at(j).name << "\" with ID: \'" 
-									<< bookHolder.at(i).customerList.at(j).customerID 
-									<< "\' and borrowed in " << bookHolder.at(i).customerList.at(j).borrowDay;
-									if ((dayCounter(bookHolder.at(i).customerList.at(j).borrowDay, today) - bookHolder.at(i).getBorrowDate()) > 0) {
-										cout << " (late for " << (dayCounter(bookHolder.at(i).customerList.at(j).borrowDay, today) - bookHolder.at(i).getBorrowDate())
-										<< " day(s))\n";
-										cout << "Sent email to " << bookHolder.at(i).customerList.at(j).customerMail << "\n";
-									}
-									else cout << "\n";
-								}
-							}
+							else cout << "\n";
 						}
 					}
 					break;
 				}
 				case 7: {
-					ReportBooks(bookHolder);
+					ReportBooks(lib);
 					break;
 				}
 
 				case 8: {
-					Add(bookHolder, foundedBook, setID, indexOfBook, bookIndex);
+					Add(lib);
 					break;
 				}
 
 				case 9: {
-					MoveBooks(bookHolder, setID, indexOfBook);
+					MoveBooks(lib);
 					break;
 				}
 
 				case 10:{
-					CreateAcc(Acc);
+					CreateAcc(lib.Acc);
 					break;
 				}
 
 				case 11: {
-					Exit(bookHolder,borrowedHolder,Acc);
+					Write(lib, true, false, true, true, true);
+					cout << "Exiting program...\n";
 					status = false;
 					break;
 				}
@@ -308,38 +313,39 @@ int main() {
 				}
         	}
 		}
+
 		else{
 			userMenu();
 			getChoice(choice);
-			switch(choice){
+			switch(choice) {
 				case 1:{
-					ViewBooks(bookHolder);
+					ViewBooks(lib);
 					break;
 				}
 				case 2:{
-					FindBooks(bookHolder,foundedBook);
-					if (foundedBook.empty()) {
+					FindBooks(lib);
+					if (lib.foundedBook.empty()) {
 						cout << "There are no book match with your search!\n";
 						break;
 					}
 
 					cout << "The book(s) you want to search for are:\n";
-					for (int i = 0; i < (int) foundedBook.size(); i++) {
-						cout << "\"" << foundedBook.at(i).getTitle() << "\" by " << foundedBook.at(i).getAuthor() << " with " << foundedBook.at(i).getQuantity()
-						<< " books in level \'" << foundedBook.at(i).getLevel() << "\' and zone \'" << foundedBook.at(i).getZone() << "\'!\n"; 
+					for (auto i : lib.foundedBook) {
+						cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
+						<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
 					}
 					break;	
 				}
 				case 3:{
-					ReportBooks(bookHolder);
+					ReportBooks(lib);
 					break;
 				}
 				case 4:{
-					Borrow(bookHolder, borrowedHolder, today, inputString);
+					Borrow(lib);
 					break;
 				}
 				case 5:{
-					Return(bookHolder, borrowedHolder, today, inputString);
+					Return(lib);
 					break;
 				}
 				case 6:{
@@ -347,7 +353,8 @@ int main() {
 					break;
 				}
 				case 7:{
-					Exit(bookHolder,borrowedHolder,Acc);
+					Write(lib, true, false, true, true, true);
+					cout << "Thanks for coming to our library! Have a nice day!\n";
 					status = false;
 					break;
 				}
@@ -363,14 +370,15 @@ int main() {
 /*=======FUNCTION=======*/
 
 //Book Main Function
-void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex) {
-	string buffer, bookInfoList[7], borrowedInfoList[5], accountList[4];
+void ReadFile(Library &lib) {
+	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
+	// account list: index(0), username(1), password(2), role(3).
 	vector<customerInfo> customerList;
-	bookHolder.clear();
-	borrowedHolder.clear();
-	Acc.clear();
+	lib.bookHolder.clear();
+	lib.borrowedHolder.clear();
+	lib.Acc.clear();
 
 	// Read borrowed books file
 	ifstream fileBorrowed("txt/borrowedBooks.txt");
@@ -379,7 +387,7 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
             continue;
         }
         stringstream ss(buffer);
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 6; i++) {
 			getline(ss, buffer, '|');
 			borrowedInfoList[i] = buffer;
 		}
@@ -391,14 +399,14 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
 			borrowedBook.info.customerMail = borrowedInfoList[3];
 			borrowedBook.info.borrowDay = borrowedInfoList[4];
 			borrowedBook.borrowQuantity = borrowedInfoList[5];
-			borrowedHolder.push_back(borrowedBook);
+			lib.borrowedHolder.push_back(borrowedBook);
 		}
 	}
 	fileBorrowed.close();
 
 	//Read account file
-	ifstream acc("txt/account.txt");
-	while(getline(acc, buffer)){
+	ifstream accFile("txt/account.txt");
+	while(getline(accFile, buffer)) {
         if(buffer.empty()) {
             continue;
         }
@@ -407,12 +415,12 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
 			getline(ss, buffer, '|');
 			accountList[i] = buffer;
 		}
-		if(accountList[0] != ""){
+		if(accountList[0] != "") {
 			Account acc(accountList[0], accountList[1], accountList[2], accountList[3]);
-			Acc.push_back(acc);
+			lib.Acc.push_back(acc);
 		}
 	}
-	acc.close();
+	accFile.close();
 
 	// Read main book file
 	ifstream file("txt/books.txt");
@@ -427,163 +435,151 @@ void ReadFile(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolde
 			bookInfoList[i] = buffer;
 		}
 		if (bookInfoList[0] != "") {
-            setID.insert(bookInfoList[0]);
-            indexOfBook[bookInfoList[1]] = bookIndex;
-            bookIndex++;
-			for (int i = 0; i < (int) borrowedHolder.size(); i++){
-				if (borrowedHolder.at(i).bookID == bookInfoList[0]) { 
-					// Store customer infomation into a vector
-					customerList.push_back(borrowedHolder.at(i).info);
+			// Store customer infomation into a vector
+			for (int i = 0; i < (int) lib.borrowedHolder.size(); i++) {
+				if (lib.borrowedHolder[i].bookID == bookInfoList[0]) {
+					customerList.push_back(lib.borrowedHolder[i].info);
 				}
 			}
-			Books book(bookInfoList[0], bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
-			bookHolder.push_back(book);           
+			Books book(bookInfoList[1], bookInfoList[2], bookInfoList[3], bookInfoList[4], bookInfoList[5], bookInfoList[6], customerList);
+			lib.bookHolder[bookInfoList[0]] = book;      
 		}
 	}
 	file.close();
 }
 
-void MoveBooks(vector<Books> &bookHolder, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook) {
-    bool validMode = false;
-    string mode;
-    while(!validMode) {
-        cout << "Move books by ID or Name: ";
-        getline(cin,mode);
-        //cout<<"\n";
-        if(mode == "ID" || mode == "Name") {
-            validMode = true;
-        }else {
-            cout << "Invalid mode \n";
-        }
-    }
-    if(mode == "ID") {
-        string id;
-        bool validID = false;
-        while(!validID) {
-            cout << "ID: ";
-            getline(cin,id);
-            if(setID.find(id) != setID.end()) {
-                validID = true;
-            }else {
-                cout<<"Invalid ID\n";
-            }
-        }
-        int indexOfID = stoi(id) - 1;
-        string zone;
-        cout<<"Zone: ";
-        getline(cin, zone);
-        //cout<<"\n";
-        string level;
-        cout<<"Level: ";
-        getline(cin, level);
-        bookHolder[indexOfID].setZone(zone);
-        bookHolder[indexOfID].setLevel(level);
-        cout << "Moved  books";
-    }
-    if(mode == "Name") {
-        string name;
-        bool validName = false;
-        while(!validName) {
-            cout << "Name: ";
-            getline(cin, name);
-            if(indexOfBook.find(name) != indexOfBook.end()) {
-                validName = true;
-            }else {
-                cout << "Invalid name \n";
-            }
-        }
-        string zone;
-        cout << "Zone: ";
-        getline(cin, zone);
-        string level;
-        cout << "Level: ";
-        getline(cin, level);
-        int i = indexOfBook[name];
-        bookHolder[i].setLevel(level);
-        bookHolder[i].setZone(zone);
-        cout << "Moved books";
-    }
+void MoveBooks(Library &lib) {
+	string bookID;
+    idInputChecker(lib.bookHolder, bookID);
+
+	string zone;
+	cout<<"Zone: ";
+	getline(cin, zone);
+
+	string level;
+	cout<<"Level: ";
+	getline(cin, level);
+
+	lib.bookHolder[bookID].setZone(zone);
+	lib.bookHolder[bookID].setLevel(level);
+	cout << "Moved books successfully!\n";
 }
 
-void Write(const string filename, vector<Books> &bookHolder) { 
-	ofstream output("txt/" + filename);
-	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		output << bookHolder.at(i).getID() << "|" << bookHolder.at(i).getTitle() << "|" 
-		<< bookHolder.at(i).getAuthor() << "|" << bookHolder.at(i).getQuantity() << "|"
-		<< bookHolder.at(i).getPages() << "|" << bookHolder.at(i).getLevel() << "|"
-		<< bookHolder.at(i).getZone() << "|\n";
-	}	
-	output.close();
-	cout << "===== Wrote to \"" << filename << "\" =====\n";
+void Write(Library &lib, bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers) {
+	cout << "===== Wrote to ";
+
+	if(writeToBooks) {
+		ofstream bookFile("txt/books.txt");
+		for (auto i : lib.bookHolder) {
+			bookFile << i.first << "|" << i.second.getTitle() << "|" 
+			<< i.second.getAuthor() << "|" << i.second.getQuantity() << "|"
+			<< i.second.getPages() << "|" << i.second.getLevel() << "|"
+			<< i.second.getZone() << "|\n";
+		}	
+		bookFile.close();
+		cout << "\"books.txt\"";
+	}
+
+	if(writeToCopy) {
+		ofstream bookCopyFile("txt/booksCopy.txt");
+		for (auto i : lib.bookHolder) {
+			bookCopyFile << i.first << "|" << i.second.getTitle() << "|" 
+			<< i.second.getAuthor() << "|" << i.second.getQuantity() << "|"
+			<< i.second.getPages() << "|" << i.second.getLevel() << "|"
+			<< i.second.getZone() << "|\n";
+		}	
+		bookCopyFile.close();
+		cout << " & \"booksCopy.txt\"";
+	}
+
+	if(writeToBorrowed) {
+		ofstream borrowedFile("txt/borrowedBooks.txt");
+		for (int i = 0; i < (int) lib.borrowedHolder.size(); i++) {
+			borrowedFile << lib.borrowedHolder[i].bookID << "|" << lib.borrowedHolder[i].info.name << "|" 
+			<< lib.borrowedHolder[i].info.customerID << "|" << lib.borrowedHolder[i].info.customerMail << "|"
+			<< lib.borrowedHolder[i].info.borrowDay << "|" << lib.borrowedHolder[i].borrowQuantity << "|\n";
+		}    
+
+		borrowedFile.close();
+		cout << " & \"borrowedBooks.txt\"";
+	}
+	
+	if(writeToAccounts) {
+		ofstream accFile("txt/account.txt");
+		
+		for(auto i : lib.Acc) {
+			accFile << i.getIndex() << "|" << i.getUser() << "|" << i.getPass() << "|" << i.getRole() << "|\n";
+		}
+		accFile.close();
+		cout << " \"account.txt\"";
+	}
+
+	if (writeToComputers) {
+		// Write computers file
+		ofstream computerFile("txt/computers.txt");
+		// (To be implemented if needed)
+		computerFile.close();
+		cout << " & \"computers.txt\"";
+	}
+	cout << " successfully! =====\n";
 }
 
-void Write(const string filename, vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder) {
-	Write(filename, bookHolder);
-	// Write borrowed books file
-	ofstream output("txt/borrowedBooks.txt");
-	for (int i = 0; i < (int) borrowedHolder.size(); i++) {
-		output << borrowedHolder.at(i).bookID << "|" << borrowedHolder.at(i).info.name << "|" 
-		<< borrowedHolder.at(i).info.customerID << "|" << borrowedHolder.at(i).info.customerMail << "|"
-		<< borrowedHolder.at(i).info.borrowDay << "|" << borrowedHolder.at(i).borrowQuantity << "|\n";
-	}	
-
-	output.close();
-	cout << "===== Wrote to \"borrowedBooks.txt\" =====\n";
-}
-
-void CountBooks(vector<Books> &bookHolder){
+void CountBooks(Library &lib) {	
 	int quantitiesSum = 0;
 
-	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		quantitiesSum += bookHolder.at(i).getQuantity();
+	for (auto i : lib.bookHolder) {
+		quantitiesSum += i.second.getQuantity();
 	}
-	cout << "There are " << bookHolder.size() << " book titles & " 
+	cout << "There are " << lib.bookHolder.size() << " book titles & " 
 	<< quantitiesSum << " books in total\n"; 
 	quantitiesSum = 0;
 }
 
-void ViewBooks(vector<Books> &bookHolder){
+void ViewBooks(Library &lib) {
 	cout << "Here are the book titles\' list\n";
 	cout << "===================\n";
-	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		cout << "\"" << bookHolder.at(i).getTitle() << "\" by " << bookHolder.at(i).getAuthor()
-		<< " with " << bookHolder.at(i).getQuantity() << " books.\n";
+	for (auto i : lib.bookHolder) {
+		cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
+		<< " with " << i.second.getQuantity() << " books.\n";
 	}
 	cout << "==================\n";
 }
 
-void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string str, const int choice) {
+void Find(Library &lib, const string title, const string author, const string choice) {
 	
 	// Check for same title/author in original vector -> push to vector "foundedBook"
-	foundedBook.clear();
-	if (choice == 1) {
-		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if (lowerCase(bookHolder.at(i).getTitle()).find(lowerCase(str)) != string::npos) {
-				foundedBook.push_back(bookHolder.at(i));
+	lib.foundedBook.clear();
+	if (choice == "Title") {
+		for (auto i : lib.bookHolder) {
+			if (lowerCase(i.second.getTitle()).find(lowerCase(title)) != string::npos) {
+				lib.foundedBook[i.first] = i.second;
 			}
 		}
 	}
-	else if (choice == 2) {
-		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if(lowerCase(bookHolder.at(i).getAuthor()).find(lowerCase(str)) != string::npos){
-				foundedBook.push_back(bookHolder.at(i));
+	else if (choice == "Author") {
+		for (auto i : lib.bookHolder) {
+			if(lowerCase(i.second.getAuthor()).find(lowerCase(author)) != string::npos) {
+				lib.foundedBook[i.first] = i.second;
 			} 
 		}
 	}
 
-}
-
-void Find(vector<Books> &bookHolder, vector<Books> &foundedBook, const string title, const string author) {
-	foundedBook.clear();
-	for (int i = 0; i < (int) bookHolder.size(); i++){
-			if((lowerCase(bookHolder.at(i).getAuthor()).find(lowerCase(author)) != string::npos)
-			&& (lowerCase(bookHolder.at(i).getTitle()).find(lowerCase(title)) != string::npos)){
-				foundedBook.push_back(bookHolder.at(i));
-		} 
+	else if (choice == "Both") {
+		for (auto i : lib.bookHolder) {
+			if ((lowerCase(i.second.getTitle()).find(lowerCase(title)) != string::npos) &&
+			(lowerCase(i.second.getAuthor()).find(lowerCase(author)) != string::npos)) {
+				lib.foundedBook[i.first] = i.second;
+			}
+		}
 	}
+
+	else {
+		cout << "Invalid choice!\n";
+	}
+
 }
 
-void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<string> &setID, unordered_map<string,int> &indexOfBook, int &bookIndex) {
+void Add(Library &lib) {
     string id, title, author, zone;
 	int quantity, level, page;
 	// Checking book's title and author
@@ -595,16 +591,18 @@ void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<st
     do {
 		getline(cin, author);
 	} while(!capitalizeWords(author));
-	Find(bookHolder, foundedBook, title, author); // Check for same book title & author
+
+	Find(lib, title, author, "Both"); // Check for same book title & author
+
 	while(true) {
 		cout << "Enter Book's Quantity (<= 999): ";
 		cin >> quantity;
 		cin.ignore();
 		if ((quantity > 0) && (quantity < 999)) {
-			if (!foundedBook.empty()) { // If there is a book in vector "foundedBook"
-				for (int i = 0; i < (int) bookHolder.size(); i++){
-					if ((bookHolder.at(i).getID() == foundedBook.front().getID())) {
-						bookHolder.at(i).changeQuantity(quantity);
+			if (!lib.foundedBook.empty()) { // If there is a book in vector "foundedBook"
+				for (auto i : lib.bookHolder) {
+					if (i.first == lib.foundedBook.begin()->first) {
+						i.second.changeQuantity(quantity);
 						cout << "===== Added " << quantity << " book(s) successfully! =====\n";
 						break;
 					}
@@ -615,6 +613,7 @@ void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<st
 		}
 		cout << "Invalid input, please try again.\n";
 	}
+
 	while(true) {
 		cout << "Enter Book's Page (0 < page < 9999): ";
 		cin >> page;
@@ -622,6 +621,7 @@ void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<st
 		if ((page > 0) && (page < 9999)) break;
 		cout << "Invalid input, please try again.\n";
 	}
+
 	while(true) {
 		cout << "Enter Book's Level (1-5): ";
 		cin >> level;
@@ -629,101 +629,101 @@ void Add(vector<Books> &bookHolder, vector<Books> &foundedBook, unordered_set<st
 		if ((level >= 1) && (level <= 5)) break;
 		cout << "Invalid input, please try again\n";
 	}
+
 	while(true) {
 		cout << "Enter Book's Zone (A-E): ";
 		cin >> zone;
 		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
 		cout << "Invalid input, please try again.\n";
 	}
-	if (bookHolder.empty()) {
+
+	if (lib.bookHolder.empty()) {
 		id = "0001";
-	} else {
-		id = idCounter(bookHolder.back().getID());
+	} 
+	else {
+		id = idCounter(lib.bookHolder.rbegin()->first);
 	}
-    setID.insert(id);
+
 	vector<customerInfo> customerList;
-	Books book(id, title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
-	bookHolder.push_back(book);
-    indexOfBook[title] = bookIndex;
-    bookIndex++;
+	Books book(title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
+	lib.bookHolder[id] = book;
+
 	cout << "\n===== Added Book successfully =====\n";
 }
 
-void Borrow(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
-	idInputChecker(bookHolder, inputString);
+void Borrow(Library &lib) {
+	string bookID;
+	idInputChecker(lib.bookHolder, bookID);
 	string buffer;
 	vector<string> customerIDlist;
     
 	// Find the book in bookHolder
-	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		if (bookHolder.at(i).getID() == inputString) {
-			if (bookHolder.at(i).getQuantity() == 0) {
-				cout << "Sorry, this book is out of stock!\n";
-				return;
-			}
-			// Get customer info
-			customerInfo newCustomer;
-			cout << "Please provide your information to borrow the book.\n";
-			cin.ignore();
-			cout << "Enter your name: ";
-			do {
-				getline(cin, buffer);
-			} while(!capitalizeWords(buffer));
-			newCustomer.name = buffer;
-			cout << "Enter your ID: ";
-			do {
-				getline(cin, buffer);
-			} while (!customerIDchecker(buffer));
-			newCustomer.customerID = buffer;
-			newCustomer.borrowDay = today;
-			// Check if customer has already borrowed this book
-			for (int j = 0; j < (int) bookHolder.at(i).customerList.size(); j++) {
-				if (bookHolder.at(i).customerList.at(j).name == newCustomer.name && bookHolder.at(i).customerList.at(j).customerID == newCustomer.customerID) {
-					cout << "You have already borrowed this book!\n";
-					return;
-				}
-			}
-			cout << "Enter your student mail: ";
-			do {
-				getline(cin, buffer);
-				if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
-			} while (true);
-			newCustomer.customerMail = buffer;
-			bookHolder.at(i).customerList.push_back(newCustomer);
-			// Ask for quantity to borrow
-			do {
-				cout << "There are " << bookHolder.at(i).getQuantity() << " book(s) available.\n";
-				cout << "Enter number of book(s) you want to borrow: ";
-				cin >> buffer;
-				if ((stoi(buffer) > 0) && (stoi(buffer) <= bookHolder.at(i).getQuantity())) {
-					break;
-				}
-				cout << "Invalid input, please try again.\n";
-			} while(true);
-
-			// Add new borrowed book info to vector "borrowedHolder"
-			BorrowedBookInfo borrowedBook;
-			borrowedBook.bookID = inputString;
-			borrowedBook.info = newCustomer;
-			borrowedBook.borrowQuantity = buffer;
-			borrowedHolder.push_back(borrowedBook);
-			bookHolder.at(i).changeQuantity(-stoi(buffer));
-			cout << "===== Book(s) borrowed successfully! =====\n";
-			cout << "You must return on " << borrowDateCalculate(today, bookHolder.at(i).getBorrowDate()) << "\n";
+	if (lib.bookHolder[bookID].getQuantity() == 0) {
+		cout << "Sorry, this book is out of stock!\n";
+		return;
+	}
+	// Get customer info
+	customerInfo newCustomer;
+	cout << "Please provide your information to borrow the book.\n";
+	cin.ignore();
+	cout << "Enter your name: ";
+	do {
+		getline(cin, buffer);
+	} while(!capitalizeWords(buffer));
+	newCustomer.name = buffer;
+	cout << "Enter your ID: ";
+	do {
+		getline(cin, buffer);
+	} while (!customerIDchecker(buffer));
+	newCustomer.customerID = buffer;
+	newCustomer.borrowDay = lib.today;
+	// Check if customer has already borrowed this book
+	for (int i = 0; i < (int) lib.bookHolder[bookID].customerList.size(); i++) {
+		if (lib.bookHolder[bookID].customerList[i].name == newCustomer.name && lib.bookHolder[bookID].customerList[i].customerID == newCustomer.customerID) {
+			cout << "You have already borrowed this book!\n";
 			return;
 		}
 	}
+	cout << "Enter your student mail: ";
+	do {
+		getline(cin, buffer);
+		if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
+	} while (true);
+	newCustomer.customerMail = buffer;
+	lib.bookHolder[bookID].customerList.push_back(newCustomer);
+	// Ask for quantity to borrow
+	do {
+		cout << "There are " << lib.bookHolder[bookID].getQuantity() << " book(s) available.\n";
+		cout << "Enter number of book(s) you want to borrow: ";
+		cin >> buffer;
+		if ((stoi(buffer) > 0) && (stoi(buffer) <= lib.bookHolder[bookID].getQuantity())) {
+			break;
+		}
+		cout << "Invalid input, please try again.\n";
+	} while(true);
+
+	// Add new borrowed book info to vector "borrowedHolder"
+	BorrowedBookInfo borrowedBook;
+	borrowedBook.bookID = bookID;
+	borrowedBook.info = newCustomer;
+	borrowedBook.borrowQuantity = buffer;
+	lib.borrowedHolder.push_back(borrowedBook);
+	lib.bookHolder[bookID].changeQuantity(-stoi(buffer));
+	cout << "===== Book(s) borrowed successfully! =====\n";
+	cout << "You must return on " << borrowDateCalculate(lib.today, lib.bookHolder[bookID].getBorrowDate()) << "\n";
+	return;
 }
 
-void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, const string today, string &inputString) {
-	idInputChecker(bookHolder, inputString);
+void Return(Library &lib) {
+	string bookID;
+	idInputChecker(lib.bookHolder, bookID);
 	string buffer;
 	vector<customerInfo> customerlist;
 
-	int originalBorrowedHolderSize = (int) borrowedHolder.size();
+	int originalBorrowedHolderSize = (int) lib.borrowedHolder.size();
 	// Find the book in borrowedHolder
 	for (int i = 0; i < originalBorrowedHolderSize; i++) {
-		if (borrowedHolder.at(i).bookID == inputString) {
+		if (lib.borrowedHolder[i].bookID == bookID) {
 			customerInfo returnCustomer;
 			cin.ignore();
 			cout << "Enter your customer name: ";
@@ -737,51 +737,44 @@ void Return(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder,
 			} while (!customerIDchecker(buffer));
 			returnCustomer.customerID = buffer;
 			// Check if customer info matches
-			if (borrowedHolder.at(i).info.name != returnCustomer.name || borrowedHolder.at(i).info.customerID != returnCustomer.customerID) {
+			if (lib.borrowedHolder[i].info.name != returnCustomer.name || lib.borrowedHolder[i].info.customerID != returnCustomer.customerID) {
 				cout << returnCustomer.name << " - " << returnCustomer.customerID << "\n";
 				cout << "No record found for this customer!\n";
 				return;
 			}
 			// Store borrowed info then remove from borrowedHolder
-			BorrowedBookInfo borrowed = borrowedHolder.at(i);
-			borrowedHolder.erase(borrowedHolder.begin() + i);
+			BorrowedBookInfo borrowed = lib.borrowedHolder[i];
+			lib.borrowedHolder.erase(lib.borrowedHolder.begin() + i);
 			// Increase book quantity in bookHolder and update customer list
-			for (int j = 0; j < (int) bookHolder.size(); j++) {
-				if (bookHolder.at(j).getID() == inputString) {
-					// Calculate late days
-					int lateDays = 0;
-					lateDays = dayCounter(borrowed.info.borrowDay, today) - bookHolder.at(j).getBorrowDate();
-					if (lateDays > 0) {
-						cout << "You are late by " << lateDays << " day(s). Please pay fine of " 
-						<< lateDays * bookHolder.at(j).getPages() * stoi(borrowed.borrowQuantity) 
-						<< " VND.\n";
-						cout << "Press Enter to confirm payment...";
-						cin.get();
-					}
-					else {
-						cout << "Thank you for returning on time!\n";
-					}
-					bookHolder.at(j).changeQuantity(stoi(borrowed.borrowQuantity));
-					int originalCustomerListSize = (int) bookHolder.at(j).customerList.size();
-					for (int k = 0; k < originalCustomerListSize; k++) {
-						if (bookHolder.at(j).customerList.at(k).name == returnCustomer.name && bookHolder.at(j).customerList.at(k).customerID == returnCustomer.customerID) {
-							bookHolder.at(j).customerList.erase(bookHolder.at(j).customerList.begin() + k);
-							break;
-						}
-					}
-					break;
-				}
+			// Calculate late days
+			int lateDays = 0;
+			lateDays = dayCounter(borrowed.info.borrowDay, lib.today) - lib.bookHolder[bookID].getBorrowDate();
+			if (lateDays > 0) {
+				cout << "You are late by " << lateDays << " day(s). Please pay fine of " 
+				<< lateDays * lib.bookHolder[bookID].getPages() * stoi(borrowed.borrowQuantity) 
+				<< " VND.\n";
+				cout << "Press Enter to confirm payment...";
+				cin.get();
 			}
-			cout << "===== Book returned successfully! =====\n";
-			return;
+			else {
+				cout << "Thank you for returning on time!\n";
+			}
+				lib.bookHolder[bookID].changeQuantity(stoi(borrowed.borrowQuantity));
+				int originalCustomerListSize = (int) lib.bookHolder[bookID].customerList.size();
+				for (int k = 0; k < originalCustomerListSize; k++) {
+					if (lib.bookHolder[bookID].customerList[k].name == returnCustomer.name && lib.bookHolder[bookID].customerList[k].customerID == returnCustomer.customerID) {
+						lib.bookHolder[bookID].customerList.erase(lib.bookHolder[bookID].customerList.begin() + k);
+						break;
+					}
+				}
+				cout << "===== Book returned successfully! =====\n";
+				return;
 		}
 	}
 }
 
-void FindBooks(vector<Books> &bookHolder, vector<Books> &foundedBook){
-	int inputNumber;
-	string inputString;
-
+void FindBooks(Library &lib) {
+	string choice, inputString;
 	do {
 		cout << "=============================================\n";
 		cout << "|Do you want to search by Title or Author  |\n";
@@ -789,30 +782,30 @@ void FindBooks(vector<Books> &bookHolder, vector<Books> &foundedBook){
 		cout << "|2. Author                                 |\n";
 		cout << "=============================================\n";
 		cout << "Enter your choice: "; 
-		cin >> inputNumber;
+		cin >> choice;
 		cin.ignore();
-		} while((inputNumber != 1) && (inputNumber != 2));
-	if (inputNumber == 1) {
+		} while((choice != "1") && (choice != "2"));
+	if (choice == "1") {
 		while(true) {
 			cout << "Title you want to search for: ";
 			getline(cin, inputString);
 			if (inputString != "") {
 				cout << "\n";
-				Find(bookHolder, foundedBook, inputString, inputNumber);
+				Find(lib, inputString, "", "Title");
 				break;
 			}
 			else {
 				cout << "Please try again.\n";
 			}
 		}
-	} 
-	else if (inputNumber == 2) {
-		while(true){
+	}
+	else if (choice == "2") {
+		while(true) {
 			cout << "Author you want to search for: ";
 			getline(cin, inputString);
 			if (inputString != "") {
 				cout << "\n";
-				Find(bookHolder, foundedBook, inputString, inputNumber);
+				Find(lib, "", inputString, "Author");
 				break;
 			}
 			else {
@@ -822,26 +815,22 @@ void FindBooks(vector<Books> &bookHolder, vector<Books> &foundedBook){
 	}
 }
 
-void ReportBooks(vector<Books> &bookHolder){
-	string inputString;
+void ReportBooks(Library &lib) {
+	string bookID;
 	int inputNumber;
 
-	idInputChecker(bookHolder, inputString);				
-	for (int i = 0; i < (int) bookHolder.size(); i++) {
-		if (bookHolder.at(i).getID() == inputString) {
-			while(true) {
-				cout << "Please enter number of book you want to report: ";
-				cin >> inputNumber;
-				cin.ignore();
-				if (bookHolder.at(i).getQuantity() >= inputNumber) {
-					bookHolder.at(i).changeQuantity(-inputNumber);
-					cout << "Reported successfully " << inputNumber << " book(s)";
-					break;
-				}
-				cout << "Invalid input, please try again.\n";
-			}
-		break;
+	idInputChecker(lib.bookHolder, bookID);				
+
+	while(true) {
+		cout << "Please enter number of book you want to report: ";
+		cin >> inputNumber;
+		cin.ignore();
+		if (lib.bookHolder[bookID].getQuantity() >= inputNumber) {
+			lib.bookHolder[bookID].changeQuantity(-inputNumber);
+			cout << "Reported successfully " << inputNumber << " book(s)";
+			break;
 		}
+		cout << "Invalid input, please try again.\n";
 	}
 }
 
@@ -862,20 +851,20 @@ string idCounter(string prevID) {
     return upComingID;
 }
 
-void idInputChecker(vector<Books> &bookHolder, string &inputString) {
+void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
 	do {
-		cout << "Please enter the book(s) ID you want to find (xxxx): ";
-		cin >> inputString;
-		for (char i : inputString) {
-			if (!isdigit(i)) inputString += "filler";
+		cout << "Please enter the book(s) ID you want to choose (xxxx): ";
+		cin >> bookID;
+		for (char i : bookID) {
+			if (!isdigit(i)) bookID += "filler";
 		}
-		if (inputString.length() != 4) {
+		if (bookID.length() != 4) {
 			cout << "Invalid input, please try again.\n";
 			continue;
 		}
 		bool found = false;
-		for (int i = 0; i < (int) bookHolder.size(); i++) {
-			if (bookHolder.at(i).getID() == inputString) {
+		for (auto i : bookHolder) {
+			if (i.first == bookID) {
 				found = true;
 				break;
 			}
@@ -902,10 +891,10 @@ bool customerIDchecker(string &customerID) {
 
 //Account Function 
 
-bool CheckPass(vector<Account> &Acc, string username, string password){
-	for(int i = 0; i < Acc.size(); i++){
-		if(username == Acc.at(i).getUser()){
-			if(password == Acc.at(i).getPass()){
+bool CheckPass(vector<Account> &Acc, string username, string password) {
+	for(int i = 0; i < (int) Acc.size(); i++) {
+		if(username == Acc[i].getUser()) {
+			if(password == Acc[i].getPass()) {
 				return true; //Check acccount when sign in 
 			}
 			
@@ -914,47 +903,37 @@ bool CheckPass(vector<Account> &Acc, string username, string password){
 	return false;
 }
 
-string getIndexAcc(vector<Account> &Acc, string &username, string &password){
-	for(int i = 0; i < Acc.size(); i++){
-		if((username == Acc.at(i).getUser()) && (password == Acc.at(i).getPass())){
+string getIndexAcc(vector<Account> &Acc, string &username, string &password) {
+	for(int i = 0; i < (int) Acc.size(); i++) {
+		if((username == Acc[i].getUser()) && (password == Acc[i].getPass())) {
 			return to_string(i);
 		}
 	}
 	return "";
 }
 
-bool isAdmin(vector<Account> &Acc, string index){
+bool isAdmin(vector<Account> &Acc, string index) {
 	int i = stoi(index);
-	if(Acc.at(i).getRole() == "admin"){return true;}
+	if(Acc[i].getRole() == "admin") {return true;}
 	return false;
 }
 
-bool CheckUser(vector<Account> &Acc, string username){
-	for(int i = 0; i < Acc.size(); i++){
-		if(username == Acc.at(i).getUser()){
+bool CheckUser(vector<Account> &Acc, string username) {
+	for(int i = 0; i < (int) Acc.size(); i++) {
+		if(username == Acc[i].getUser()) {
 			return true;
 		}
 	}
 	return false;
 }
 
-void Write(vector<Account> &Acc){
-	ofstream output("account.txt");
-	
-	for(int i = 0; i < (int)Acc.size(); i++){
-		output << Acc.at(i).getIndex() << "|" << Acc.at(i).getUser() << "|" << Acc.at(i).getPass() << "|" << Acc.at(i).getRole() << "|\n";
-	}
-	output.close();
-	cout << "===== Wrote to \"account.txt\" =====\n";
-}
-
-void CreateAcc(vector<Account> &Acc){
+void CreateAcc(vector<Account> &Acc) {
 	string username, password, role;
 	do{
 		cout << "Create account\n";
 		cout << "Username: "; cin >> username;
 		cout << "Password: "; cin >> password;
-		if(CheckUser(Acc, username)){
+		if(CheckUser(Acc, username)) {
 			cout << "Existed Username\n";
 		}else{
 			cout << "Account's Role: "; cin >> role;
@@ -966,9 +945,9 @@ void CreateAcc(vector<Account> &Acc){
 	cout << "====Create account successfully ====\n";
 }
 
-void DisplayAcc(vector<Account> &Acc){
-	for(int i = 0; i < Acc.size(); i++){
-		cout << Acc.at(i).getIndex() << "|" << Acc.at(i).getUser() << "|" << Acc.at(i).getPass() <<"|"<< Acc.at(i).getRole() << "|\n";
+void DisplayAcc(vector<Account> &Acc) {
+	for(int i = 0; i < (int) Acc.size(); i++) {
+		cout << Acc[i].getIndex() << "|" << Acc[i].getUser() << "|" << Acc[i].getPass() <<"|"<< Acc[i].getRole() << "|\n";
 	}
 }
 
@@ -1126,7 +1105,7 @@ int dayCounter(string start, string end) {
 }
 
 //UI Function 
-void adminMenu(){
+void adminMenu() {
     cout << "\n";
 	cout << "============== Library ==============\n";
 	cout << "|1. Number of books                 |\n"; // Done
@@ -1143,7 +1122,7 @@ void adminMenu(){
 	cout << "=====================================\n";
 }
 
-void userMenu(){
+void userMenu() {
     cout << "\n";
 	cout << "============== Library ==============\n";
 	cout << "|1. View all books                  |\n"; // Done
@@ -1156,16 +1135,10 @@ void userMenu(){
 	cout << "=====================================\n";
 }
 
-int getChoice(int &choice){
+int getChoice(int &choice) {
     cout << "Enter your choice: ";
     cin >> choice;
 	cin.ignore();
 	cout << "\n";
     return choice;
-}
-
-void Exit(vector<Books> &bookHolder, vector<BorrowedBookInfo> &borrowedHolder, vector<Account> &Acc){
-    Write("books.txt", bookHolder, borrowedHolder);
-    Write(Acc);
-	cout << "\nThanks for comming have a good day !\n";
 }
