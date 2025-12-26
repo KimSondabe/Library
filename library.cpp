@@ -183,7 +183,7 @@ void idInputChecker(map<string, Books> &bookHolder, string &inputString); // Che
 //UI Function
 void adminMenu();//UI Admin's Menu
 void userMenu();//UI User's Menu
-int getChoice(int &choice);//get userchoice
+string getIntInput(string str); //Get user input
 
 /*========MAIN PROGRAM=======*/
 int main() {
@@ -207,8 +207,10 @@ int main() {
 	
 	// Login interface
 	do {
-		cout << "Username: "; cin >> username;
-		cout << "Password: "; cin >> password;
+		cout << "Username: "; 
+		getline(cin, username);
+		cout << "Password: "; 
+		getline(cin, password);
 		if(CheckPass(lib.Acc, username, password)) {
 			cout << "Successfully!\n";
 			break;
@@ -223,9 +225,7 @@ int main() {
     while(status) {
 		if(isAdmin(lib.Acc, getIndexAcc(lib.Acc, username, password))) {
 			adminMenu();
-			getChoice(choice);
-
-			switch(choice) {
+			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1: { 
 					CountBooks(lib);
 					break;
@@ -316,8 +316,7 @@ int main() {
 
 		else{
 			userMenu();
-			getChoice(choice);
-			switch(choice) {
+			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1:{
 					ViewBooks(lib);
 					break;
@@ -449,16 +448,21 @@ void ReadFile(Library &lib) {
 }
 
 void MoveBooks(Library &lib) {
-	string bookID;
+	string bookID, level, zone;
     idInputChecker(lib.bookHolder, bookID);
 
-	string zone;
-	cout<<"Zone: ";
-	getline(cin, zone);
+	while(true) {
+		level = getIntInput("Enter Book's Level (1-5): ");
+		if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
+		cout << "Invalid input, please try again\n";
+	}
 
-	string level;
-	cout<<"Level: ";
-	getline(cin, level);
+	while(true) {
+		cout << "Enter Book's Zone (A-E): ";
+		getline(cin, zone);
+		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+		cout << "Invalid input, please try again.\n";
+	}
 
 	lib.bookHolder[bookID].setZone(zone);
 	lib.bookHolder[bookID].setLevel(level);
@@ -580,8 +584,7 @@ void Find(Library &lib, const string title, const string author, const string ch
 }
 
 void Add(Library &lib) {
-    string id, title, author, zone;
-	int quantity, level, page;
+    string id, title, author, zone, quantity, page, level;
 	// Checking book's title and author
 	cout << "Enter Book's Title: ";
     do {
@@ -595,14 +598,12 @@ void Add(Library &lib) {
 	Find(lib, title, author, "Both"); // Check for same book title & author
 
 	while(true) {
-		cout << "Enter Book's Quantity (<= 999): ";
-		cin >> quantity;
-		cin.ignore();
-		if ((quantity > 0) && (quantity < 999)) {
+		quantity = getIntInput("Enter Book's Quantity (0 < quantity < 999): ");
+		if ((stoi(quantity) > 0) && (stoi(quantity) < 999)) {
 			if (!lib.foundedBook.empty()) { // If there is a book in vector "foundedBook"
 				for (auto i : lib.bookHolder) {
 					if (i.first == lib.foundedBook.begin()->first) {
-						i.second.changeQuantity(quantity);
+						i.second.changeQuantity(stoi(quantity));
 						cout << "===== Added " << quantity << " book(s) successfully! =====\n";
 						break;
 					}
@@ -615,24 +616,20 @@ void Add(Library &lib) {
 	}
 
 	while(true) {
-		cout << "Enter Book's Page (0 < page < 9999): ";
-		cin >> page;
-		cin.ignore();
-		if ((page > 0) && (page < 9999)) break;
+		page = getIntInput("Enter Book's Page (0 < page < 9999): ");
+		if ((stoi(page) > 0) && (stoi(page) < 9999)) break;
 		cout << "Invalid input, please try again.\n";
 	}
 
 	while(true) {
-		cout << "Enter Book's Level (1-5): ";
-		cin >> level;
-		cin.ignore();
-		if ((level >= 1) && (level <= 5)) break;
+		level = getIntInput("Enter Book's Level (1-5): ");
+		if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
 		cout << "Invalid input, please try again\n";
 	}
 
 	while(true) {
 		cout << "Enter Book's Zone (A-E): ";
-		cin >> zone;
+		getline(cin, zone);
 		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
 		cout << "Invalid input, please try again.\n";
 	}
@@ -645,16 +642,15 @@ void Add(Library &lib) {
 	}
 
 	vector<customerInfo> customerList;
-	Books book(title, author, to_string(quantity), to_string(page), to_string(level), zone, customerList);
+	Books book(title, author, quantity, page, level, zone, customerList);
 	lib.bookHolder[id] = book;
 
 	cout << "\n===== Added Book successfully =====\n";
 }
 
 void Borrow(Library &lib) {
-	string bookID;
+	string bookID, buffer;
 	idInputChecker(lib.bookHolder, bookID);
-	string buffer;
 	vector<string> customerIDlist;
     
 	// Find the book in bookHolder
@@ -665,17 +661,18 @@ void Borrow(Library &lib) {
 	// Get customer info
 	customerInfo newCustomer;
 	cout << "Please provide your information to borrow the book.\n";
-	cin.ignore();
 	cout << "Enter your name: ";
 	do {
 		getline(cin, buffer);
 	} while(!capitalizeWords(buffer));
 	newCustomer.name = buffer;
+
 	cout << "Enter your ID: ";
 	do {
 		getline(cin, buffer);
 	} while (!customerIDchecker(buffer));
 	newCustomer.customerID = buffer;
+
 	newCustomer.borrowDay = lib.today;
 	// Check if customer has already borrowed this book
 	for (int i = 0; i < (int) lib.bookHolder[bookID].customerList.size(); i++) {
@@ -684,18 +681,19 @@ void Borrow(Library &lib) {
 			return;
 		}
 	}
+
 	cout << "Enter your student mail: ";
 	do {
 		getline(cin, buffer);
 		if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
 	} while (true);
 	newCustomer.customerMail = buffer;
+
 	lib.bookHolder[bookID].customerList.push_back(newCustomer);
 	// Ask for quantity to borrow
 	do {
 		cout << "There are " << lib.bookHolder[bookID].getQuantity() << " book(s) available.\n";
-		cout << "Enter number of book(s) you want to borrow: ";
-		cin >> buffer;
+		buffer = getIntInput("Enter number of book(s) you want to borrow: ");
 		if ((stoi(buffer) > 0) && (stoi(buffer) <= lib.bookHolder[bookID].getQuantity())) {
 			break;
 		}
@@ -715,27 +713,28 @@ void Borrow(Library &lib) {
 }
 
 void Return(Library &lib) {
-	string bookID;
+	string bookID, buffer;
 	idInputChecker(lib.bookHolder, bookID);
-	string buffer;
 	vector<customerInfo> customerlist;
-
 	int originalBorrowedHolderSize = (int) lib.borrowedHolder.size();
+
 	// Find the book in borrowedHolder
 	for (int i = 0; i < originalBorrowedHolderSize; i++) {
 		if (lib.borrowedHolder[i].bookID == bookID) {
 			customerInfo returnCustomer;
-			cin.ignore();
+	
 			cout << "Enter your customer name: ";
 			do {
 				getline(cin, buffer);
 			} while(!capitalizeWords(buffer));
 			returnCustomer.name = buffer;
+
 			cout << "Enter your ID: ";
 			do {
 				getline(cin, buffer);
 			} while (!customerIDchecker(buffer));
 			returnCustomer.customerID = buffer;
+
 			// Check if customer info matches
 			if (lib.borrowedHolder[i].info.name != returnCustomer.name || lib.borrowedHolder[i].info.customerID != returnCustomer.customerID) {
 				cout << returnCustomer.name << " - " << returnCustomer.customerID << "\n";
@@ -781,10 +780,9 @@ void FindBooks(Library &lib) {
 		cout << "|1. Title                                  |\n";
 		cout << "|2. Author                                 |\n";
 		cout << "=============================================\n";
-		cout << "Enter your choice: "; 
-		cin >> choice;
-		cin.ignore();
-		} while((choice != "1") && (choice != "2"));
+		choice = getIntInput("Enter your choice (1-2): ");
+	} while((choice != "1") && (choice != "2"));
+
 	if (choice == "1") {
 		while(true) {
 			cout << "Title you want to search for: ";
@@ -799,6 +797,7 @@ void FindBooks(Library &lib) {
 			}
 		}
 	}
+
 	else if (choice == "2") {
 		while(true) {
 			cout << "Author you want to search for: ";
@@ -816,18 +815,16 @@ void FindBooks(Library &lib) {
 }
 
 void ReportBooks(Library &lib) {
-	string bookID;
-	int inputNumber;
+	string bookID, quantity;
 
 	idInputChecker(lib.bookHolder, bookID);				
 
 	while(true) {
-		cout << "Please enter number of book you want to report: ";
-		cin >> inputNumber;
-		cin.ignore();
-		if (lib.bookHolder[bookID].getQuantity() >= inputNumber) {
-			lib.bookHolder[bookID].changeQuantity(-inputNumber);
-			cout << "Reported successfully " << inputNumber << " book(s)";
+		quantity = getIntInput("Please enter number of book you want to report: ");
+
+		if (lib.bookHolder[bookID].getQuantity() >= stoi(quantity)) {
+			lib.bookHolder[bookID].changeQuantity(-stoi(quantity));
+			cout << "Reported successfully " << quantity << " book(s)";
 			break;
 		}
 		cout << "Invalid input, please try again.\n";
@@ -854,7 +851,7 @@ string idCounter(string prevID) {
 void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
 	do {
 		cout << "Please enter the book(s) ID you want to choose (xxxx): ";
-		cin >> bookID;
+		getline(cin, bookID);
 		for (char i : bookID) {
 			if (!isdigit(i)) bookID += "filler";
 		}
@@ -880,7 +877,7 @@ bool customerIDchecker(string &customerID) {
 		return false;
 	}
 	for (char c : customerID) {
-		if (!isdigit((unsigned char)c)) {
+		if (!isdigit(c)) {
 			cout << "Invalid input, please try again.\n";
 			return false;
 		}
@@ -931,12 +928,16 @@ void CreateAcc(vector<Account> &Acc) {
 	string username, password, role;
 	do{
 		cout << "Create account\n";
-		cout << "Username: "; cin >> username;
-		cout << "Password: "; cin >> password;
+		cout << "Username: "; 
+		getline(cin, username);
+		cout << "Password: "; 
+		getline(cin, password);
 		if(CheckUser(Acc, username)) {
 			cout << "Existed Username\n";
-		}else{
-			cout << "Account's Role: "; cin >> role;
+		}
+		else{
+			cout << "Account's Role: "; 
+			getline(cin, role);
 			Account acc(to_string(1 + Acc.size()),username, password, role);
 			Acc.push_back(acc);			
 			break;
@@ -1111,13 +1112,13 @@ void adminMenu() {
 	cout << "|1. Number of books                 |\n"; // Done
 	cout << "|2. Store data into other file      |\n"; // Done
     cout << "|3. View all books                  |\n"; // Done
-	cout << "|4. View all accounts               |\n"; //Done
+	cout << "|4. View all accounts               |\n"; // Done
 	cout << "|5. Find book                       |\n"; // Done
     cout << "|6. View book borrower(s)           |\n"; // Done
 	cout << "|7. Report book's issue             |\n"; // Done
 	cout << "|8. Add book(s)                     |\n"; // Done
-	cout << "|9. Move book(s) to another place   |\n"; // To be done
-	cout << "|10. Create an account              |\n"; //Undone
+	cout << "|9. Move book(s) to another place   |\n"; // Done
+	cout << "|10. Create an account              |\n"; // Done
 	cout << "|11. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
@@ -1130,15 +1131,29 @@ void userMenu() {
     cout << "|3. Report book's issue             |\n"; // Done
 	cout << "|4. Borrow book (s)                 |\n"; // Done
 	cout << "|5. Return book (s)                 |\n"; // Done
-    cout << "|6. Profile                         |\n"; // Done
+    cout << "|6. Profile                         |\n"; // Undone
 	cout << "|7. Exit                            |\n"; // Done
 	cout << "=====================================\n";
 }
 
-int getChoice(int &choice) {
-    cout << "Enter your choice: ";
-    cin >> choice;
-	cin.ignore();
+string getIntInput(string str) {
+	string input;
+	bool isNumber = false;
+	do {
+		cout << str;
+		getline(cin, input);
+		for (char c : input) {
+			if (!isdigit(c)) {
+				isNumber = false;
+				break;
+			}
+			else isNumber = true;
+		}
+		if (!isNumber) {
+			cout << "Invalid input, please try again.\n";
+		}
+	} while (!isNumber);
+	
 	cout << "\n";
-    return choice;
+    return input;
 }
