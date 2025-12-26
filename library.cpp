@@ -41,21 +41,7 @@ class LibraryItems {
 		/* ======== Getters ========*/
 
 		/* ======== Setters ========*/
-		void Move() {
-			string level, zone;
-			while(true) {
-				level = getIntInput("Enter Level (1-5): ");
-				if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
-				cout << "Invalid input, please try again\n";
-			}
-
-			while(true) {
-				cout << "Enter Zone (A-E): ";
-				getline(cin, zone);
-				if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-				cout << "Invalid input, please try again.\n";
-			}
-
+		void Move(string level, string zone) {
 			this->zone = zone;
 			this->level = level;
 			cout << "Moved successfully!\n";
@@ -163,7 +149,7 @@ typedef struct {
 void ReadFile(Library &lib); // Read data from file
 void Write(Library &lib,bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers); // Write data to file
 
-// Book Main Functions
+// Book Features Functions
 void Find(Library &lib, const string title, const string author, const string choice); // Find book by title/author
 void CountBooks(Library &lib); // Count total books
 void ViewBooks(Library &lib); // View book(s)
@@ -171,7 +157,7 @@ void Add(Library &lib); // Add book(s)
 void Borrow(Library &lib); // Borrow book(s)
 void Return(Library &lib); // Return book(s)
 void MoveItem(Library &lib, const string itemType); // Move item(s)
-void FindBooks(Library &lib); //Feature Find
+void FindBooks(Library &lib); // Find Feature
 void ReportBooks(Library &lib); //Report books' issues
 void viewBorrowedUsers(Library &lib); // View users who borrowed a specific book
 
@@ -448,10 +434,25 @@ void ReadFile(Library &lib) {
 
 void MoveItem(Library &lib, const string itemType) {
 	if (itemType == "Book") {	
-		string bookID;
+		string bookID, level, zone;
 		idInputChecker(lib.bookHolder, bookID);
-		lib.bookHolder[bookID].Move();
+		cout << "Current location - Level: " << lib.bookHolder[bookID].getLevel()
+		<< ", Zone: " << lib.bookHolder[bookID].getZone() << "\n";
+		while(true) {
+			level = getIntInput("Enter Level (1-5): ");
+			if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
+			cout << "Invalid input, please try again\n";
+		}
+
+		while(true) {
+			cout << "Enter Zone (A-E): ";
+			getline(cin, zone);
+			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+			cout << "Invalid input, please try again.\n";
+		}
+		lib.bookHolder[bookID].Move(level, zone);
 	}
+
 	else if (itemType == "Computer") {
 		// Move computer function (To be implemented if needed)
 	}
@@ -1162,7 +1163,5 @@ string getIntInput(string str) {
 			cout << "Invalid input, please try again.\n";
 		}
 	} while (!isNumber);
-	
-	cout << "\n";
     return input;
 }
