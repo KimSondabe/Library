@@ -87,24 +87,37 @@ class Books : public LibraryItems {
 class Computers : public LibraryItems {
 	private:
 		string specs;
+		bool available;
 	public:
 		/* ======== Default Constructor ======== */
-		Computers() : LibraryItems(), specs("") {}
+		Computers() : LibraryItems(), specs(""), available(true) {}
 		/* ======== Default Constructor ======== */
 
 		/* ======== Constructor ======== */
-		Computers(string level, string zone, string specs)
-		: LibraryItems(level, zone), specs(specs) {}
+		Computers(string specs, string level, string zone)
+		: LibraryItems(level, zone), specs(specs), available(true) {}
 		/* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
 		int rentMoney(int hours) {
 			return (specs == "HIGH") ? 12000 * hours : (specs == "MID") ? 10000 * hours : 7000 * hours;
 		}
+		string getSpecs() {return specs;}
+		bool isAvailable() {return available;}
 		/* ======== Getters ========*/
 
 		/* ======== Setters ========*/
 		void setSpecs(string specs) {this->specs = specs;}
+		void rentComputer(string hours) {
+			if (available){
+				available = false;
+				cout << "Total rent cost: " << rentMoney(stoi(hours)) << " VND\n";
+				cout << "Enter to confirm payment...";
+				cin.get();
+				return;
+			}
+			cout << "This computer is currently unavailable!\n";
+		}
 		/* ======== Setters ========*/
 };
 
@@ -139,6 +152,7 @@ typedef struct {
 	map<string, Books> bookHolder;
 	map<string, Books> foundedBook;
 	vector<BorrowedBookInfo> borrowedHolder;
+	map<string, Computers> computerHolder;
 	vector<Account> Acc;
 	string today;
 } Library;
@@ -148,18 +162,21 @@ typedef struct {
 // File working functions
 void ReadFile(Library &lib); // Read data from file
 void Write(Library &lib,bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers); // Write data to file
+void View(Library &lib, const string choice); // View book(s)
 
 // Book Features Functions
 void Find(Library &lib, const string title, const string author, const string choice); // Find book by title/author
 void CountBooks(Library &lib); // Count total books
-void ViewBooks(Library &lib); // View book(s)
 void Add(Library &lib); // Add book(s)
 void Borrow(Library &lib); // Borrow book(s)
 void Return(Library &lib); // Return book(s)
-void MoveItem(Library &lib, const string itemType); // Move item(s)
+void MoveItem(Library &lib); // Move item(s)
 void FindBooks(Library &lib); // Find Feature
 void ReportBooks(Library &lib); //Report books' issues
 void viewBorrowedUsers(Library &lib); // View users who borrowed a specific book
+
+// Computer Features Functions
+void rentComputer(Library &lib); // Rent computer(s)
 
 // Account Main Function
 bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
@@ -183,6 +200,7 @@ string borrowDateCalculate(string start, int borrowDuration); // Calculate retur
 bool customerIDchecker(string &customerID); // Check valid customer ID input
 string idCounter(string prevID); // Generate next ID
 void idInputChecker(map<string, Books> &bookHolder, string &inputString); // Check valid book ID input
+void idInputChecker(map<string, Computers> &computerHolder, string &inputString); // Check valid computer ID input
 
 //UI Function
 void adminMenu();//UI Admin's Menu
@@ -239,16 +257,19 @@ int main() {
 				}
 
 				case 3: {
-					ViewBooks(lib);
+					View(lib, "books");
 					break;
 				}
-
 				case 4: {
+					View(lib, "computers");
+					break;
+				}
+				case 5: {
 					DisplayAcc(lib.Acc);
 					break;
 				}
 
-				case 5: {
+				case 6: {
 					FindBooks(lib);
 					if (lib.foundedBook.empty()) {
 						cout << "There are no book match with your search!\n";
@@ -262,31 +283,31 @@ int main() {
 					break;
 				}
 				
-				case 6: {
+				case 7: {
 					viewBorrowedUsers(lib);
 					break;
 				}
-				case 7: {
+				case 8: {
 					ReportBooks(lib);
 					break;
 				}
 
-				case 8: {
+				case 9: {
 					Add(lib);
 					break;
 				}
 
-				case 9: {
-					MoveItem(lib, "Book");
+				case 10: {
+					MoveItem(lib);
 					break;
 				}
 
-				case 10:{
+				case 11:{
 					CreateAcc(lib.Acc);
 					break;
 				}
 
-				case 11: {
+				case 12: {
 					Write(lib, true, false, true, true, true);
 					cout << "Exiting program...\n";
 					status = false;
@@ -303,10 +324,14 @@ int main() {
 			userMenu();
 			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1:{
-					ViewBooks(lib);
+					View(lib, "books");
 					break;
 				}
 				case 2:{
+					View(lib, "computers");
+					break;
+				}
+				case 3:{
 					FindBooks(lib);
 					if (lib.foundedBook.empty()) {
 						cout << "There are no book match with your search!\n";
@@ -320,23 +345,27 @@ int main() {
 					}
 					break;	
 				}
-				case 3:{
+				case 4:{
 					ReportBooks(lib);
 					break;
 				}
-				case 4:{
+				case 5:{
 					Borrow(lib);
 					break;
 				}
-				case 5:{
+				case 6:{
 					Return(lib);
 					break;
 				}
-				case 6:{
-					// This feature is under development
+				case 7:{
+					rentComputer(lib);
 					break;
 				}
-				case 7:{
+				case 8:{
+					// In progress...
+					break;
+				}
+				case 9:{
 					Write(lib, true, false, true, true, true);
 					cout << "Thanks for coming to our library! Have a nice day!\n";
 					status = false;
@@ -355,10 +384,11 @@ int main() {
 
 //Book Main Function
 void ReadFile(Library &lib) {
-	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[4];
+	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[4], computerInfoList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	// account list: index(0), username(1), password(2), role(3).
+	// computer info list: id(0), spec(1), level(2), zone(3).
 	vector<customerInfo> customerList;
 	lib.bookHolder.clear();
 	lib.borrowedHolder.clear();
@@ -430,10 +460,36 @@ void ReadFile(Library &lib) {
 		}
 	}
 	file.close();
+
+	ifstream computerFile("txt/computers.txt");
+	while (getline(computerFile, buffer)) {
+		if(buffer.empty()) {
+			continue;
+		}
+		stringstream ss(buffer);
+		for (int i = 0; i < 4; i++) {
+			getline(ss, buffer, '|');
+			computerInfoList[i] = buffer;
+		}
+		if (computerInfoList[0] != "") {
+			Computers computer(computerInfoList[1], computerInfoList[2], computerInfoList[3]);
+			lib.computerHolder[computerInfoList[0]] = computer;      
+		}
+	}
+	computerFile.close();
 }
 
-void MoveItem(Library &lib, const string itemType) {
-	if (itemType == "Book") {	
+void MoveItem(Library &lib) {
+	string itemType;
+	cout << "Which item do you want to move?\n";
+	cout << "1. Book\n";
+	cout << "2. Computer\n";
+	do {
+		itemType = getIntInput("Enter your choice (1-2): ");
+		if ((itemType == "1") || (itemType == "2")) break;
+		cout << "Invalid input, please try again.\n";
+	} while(true);
+	if (itemType == "1") {	
 		string bookID, level, zone;
 		idInputChecker(lib.bookHolder, bookID);
 		cout << "Current location - Level: " << lib.bookHolder[bookID].getLevel()
@@ -453,8 +509,24 @@ void MoveItem(Library &lib, const string itemType) {
 		lib.bookHolder[bookID].Move(level, zone);
 	}
 
-	else if (itemType == "Computer") {
-		// Move computer function (To be implemented if needed)
+	else if (itemType == "2") {
+		string computerID, level, zone;
+		idInputChecker(lib.computerHolder, computerID);
+		cout << "Current location - Level: " << lib.computerHolder[computerID].getLevel()
+		<< ", Zone: " << lib.computerHolder[computerID].getZone() << "\n";
+		while(true) {
+			level = getIntInput("Enter Level (5-7): ");
+			if ((stoi(level) >= 5) && (stoi(level) <= 7)) break;
+			cout << "Invalid input, please try again\n";
+		}
+
+		while(true) {
+			cout << "Enter Zone (A-E): ";
+			getline(cin, zone);
+			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+			cout << "Invalid input, please try again.\n";
+		}
+		lib.computerHolder[computerID].Move(level, zone);
 	}
 }
 
@@ -510,7 +582,10 @@ void Write(Library &lib, bool writeToBooks, bool writeToCopy, bool writeToBorrow
 	if (writeToComputers) {
 		// Write computers file
 		ofstream computerFile("txt/computers.txt");
-		// (To be implemented if needed)
+		for (auto i : lib.computerHolder) {
+			computerFile << i.first << "|" << i.second.getSpecs() << "|" 
+			<< i.second.getLevel() << "|" << i.second.getZone() << "|\n";
+		}
 		computerFile.close();
 		cout << " & \"computers.txt\"";
 	}
@@ -528,14 +603,27 @@ void CountBooks(Library &lib) {
 	quantitiesSum = 0;
 }
 
-void ViewBooks(Library &lib) {
-	cout << "Here are the book titles\' list\n";
-	cout << "===================\n";
-	for (auto i : lib.bookHolder) {
-		cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
-		<< " with " << i.second.getQuantity() << " books.\n";
+void View(Library &lib, const string choice) {
+	if (choice == "books") {	
+		cout << "Here are the book titles\' list\n";
+		cout << "===================\n";
+		for (auto i : lib.bookHolder) {
+			cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
+			<< " with " << i.second.getQuantity() << " books.\n";
+		}
+		cout << "==================\n";
 	}
-	cout << "==================\n";
+	else if (choice == "computers") {
+		cout << "Here are the computer(s) available in the library:\n";
+		cout << "===================\n";
+		for (auto i : lib.computerHolder) {
+			if (i.second.isAvailable()) {
+				cout << "Computer ID: " << i.first << "\n - Specs: " << i.second.getSpecs()
+				<< "\n - Location: Level " << i.second.getLevel() << ", Zone " << i.second.getZone() << "\n";
+			}
+		}
+		cout << "==================\n";
+	}
 }
 
 void Find(Library &lib, const string title, const string author, const string choice) {
@@ -573,68 +661,114 @@ void Find(Library &lib, const string title, const string author, const string ch
 }
 
 void Add(Library &lib) {
-    string id, title, author, zone, quantity, page, level;
-	// Checking book's title and author
-	cout << "Enter Book's Title: ";
-    do {
-		getline(cin, title);
-	} while(!capitalizeWords(title));
-	cout << "Enter Book's Author: ";
-    do {
-		getline(cin, author);
-	} while(!capitalizeWords(author));
+	cout << "Which item do you want to add?\n";
+	cout << "1. Book\n";
+	cout << "2. Computer\n";
+	string itemType;
+	do {
+		itemType = getIntInput("Enter your choice (1-2): ");
+		if ((itemType == "1") || (itemType == "2")) break;
+		cout << "Invalid input, please try again.\n";
+	} while(true);
+	if (itemType == "1") {
+		string id, title, author, zone, quantity, page, level;
+		// Checking book's title and author
+		cout << "Enter Book's Title: ";
+		do {
+			getline(cin, title);
+		} while(!capitalizeWords(title));
+		cout << "Enter Book's Author: ";
+		do {
+			getline(cin, author);
+		} while(!capitalizeWords(author));
 
-	Find(lib, title, author, "Both"); // Check for same book title & author
+		Find(lib, title, author, "Both"); // Check for same book title & author
 
-	while(true) {
-		quantity = getIntInput("Enter Book's Quantity (0 < quantity < 999): ");
-		if ((stoi(quantity) > 0) && (stoi(quantity) < 999)) {
-			if (!lib.foundedBook.empty()) { // If there is a book in vector "foundedBook"
-				for (auto i : lib.bookHolder) {
-					if (i.first == lib.foundedBook.begin()->first) {
-						i.second.changeQuantity(stoi(quantity));
-						cout << "===== Added " << quantity << " book(s) successfully! =====\n";
-						break;
+		while(true) {
+			quantity = getIntInput("Enter Book's Quantity (0 < quantity < 999): ");
+			if ((stoi(quantity) > 0) && (stoi(quantity) < 999)) {
+				if (!lib.foundedBook.empty()) { // If there is a book in vector "foundedBook"
+					for (auto i : lib.bookHolder) {
+						if (i.first == lib.foundedBook.begin()->first) {
+							i.second.changeQuantity(stoi(quantity));
+							cout << "===== Added " << quantity << " book(s) successfully! =====\n";
+							break;
+						}
 					}
+					return;
 				}
-				return;
+				break;
 			}
-			break;
+			cout << "Invalid input, please try again.\n";
 		}
-		cout << "Invalid input, please try again.\n";
+
+		while(true) {
+			page = getIntInput("Enter Book's Page (0 < page < 9999): ");
+			if ((stoi(page) > 0) && (stoi(page) < 9999)) break;
+			cout << "Invalid input, please try again.\n";
+		}
+
+		while(true) {
+			level = getIntInput("Enter Book's Level (1-5): ");
+			if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
+			cout << "Invalid input, please try again\n";
+		}
+
+		while(true) {
+			cout << "Enter Book's Zone (A-E): ";
+			getline(cin, zone);
+			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+			cout << "Invalid input, please try again.\n";
+		}
+
+		if (lib.bookHolder.empty()) {
+			id = "0001";
+		} 
+		else {
+			id = idCounter(lib.bookHolder.rbegin()->first);
+		}
+
+		vector<customerInfo> customerList;
+		Books book(title, author, quantity, page, level, zone, customerList);
+		lib.bookHolder[id] = book;
+
+		cout << "\n===== Added Book successfully =====\n";
 	}
+	else if (itemType == "2") {
+		string id, specs, zone, level;
+		// Checking computer's specs
+		cout << "Enter Computer's Specs (HIGH/MID/LOW): ";
+		do {
+			getline(cin, specs);
+			if ((specs == "HIGH") || (specs == "MID") || (specs == "LOW")) break;
+			cout << "Invalid input, please try again.\n";
+		} while(true);
 
-	while(true) {
-		page = getIntInput("Enter Book's Page (0 < page < 9999): ");
-		if ((stoi(page) > 0) && (stoi(page) < 9999)) break;
-		cout << "Invalid input, please try again.\n";
+		while(true) {
+			level = getIntInput("Enter Computer's Level (5-7): ");
+			if ((stoi(level) >= 5) && (stoi(level) <= 7)) break;
+			cout << "Invalid input, please try again\n";
+		}
+
+		while(true) {
+			cout << "Enter Computer's Zone (A-E): ";
+			getline(cin, zone);
+			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+			cout << "Invalid input, please try again.\n";
+		}
+
+		if (lib.computerHolder.empty()) {
+			id = "0001";
+		} 
+		else {
+			id = idCounter(lib.computerHolder.rbegin()->first);
+		}
+
+		Computers computer(specs, level, zone);
+		lib.computerHolder[id] = computer;
+
+		cout << "\n===== Added Computer successfully =====\n";
 	}
-
-	while(true) {
-		level = getIntInput("Enter Book's Level (1-5): ");
-		if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
-		cout << "Invalid input, please try again\n";
-	}
-
-	while(true) {
-		cout << "Enter Book's Zone (A-E): ";
-		getline(cin, zone);
-		if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-		cout << "Invalid input, please try again.\n";
-	}
-
-	if (lib.bookHolder.empty()) {
-		id = "0001";
-	} 
-	else {
-		id = idCounter(lib.bookHolder.rbegin()->first);
-	}
-
-	vector<customerInfo> customerList;
-	Books book(title, author, quantity, page, level, zone, customerList);
-	lib.bookHolder[id] = book;
-
-	cout << "\n===== Added Book successfully =====\n";
 }
 
 void viewBorrowedUsers(Library &lib) {
@@ -841,7 +975,23 @@ void ReportBooks(Library &lib) {
 	}
 }
 
-//Book support function
+void rentComputer(Library &lib) {
+	string comID, choice;
+	do {
+		idInputChecker(lib.computerHolder, comID);
+		cout << "You have chosen computer " << comID << " with specs: " << lib.computerHolder[comID].getSpecs() << "\n";
+		cout << "Are you sure you want to rent this computer? (Press Y to confirm): ";
+		getline(cin, choice);
+	} while (lowerCase(choice) != "y");
+	if (!lib.computerHolder[comID].isAvailable()) {
+		cout << "Sorry, this computer is currently rented out!\n";
+		return;
+	}
+	lib.computerHolder[comID].rentComputer(getIntInput("How many hours do you want to rent the computer for?"));
+	cout << "You have successfully rented computer " << comID << "!\n";
+	cout << "Location: Level " << lib.computerHolder[comID].getLevel() << ", Zone " << lib.computerHolder[comID].getZone() << "\n";
+
+}
 string idCounter(string prevID) {
     if (prevID.size() != 4) return "";
     for (char c : prevID) { 
@@ -872,6 +1022,28 @@ void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
 		bool found = false;
 		for (auto i : bookHolder) {
 			if (i.first == bookID) {
+				found = true;
+				break;
+			}
+		}
+		if (found) break;
+		cout << "Invalid input, please try again.\n";
+	} while(true);
+}
+void idInputChecker(map<string, Computers> &computerHolder, string &computerID) {
+	do {
+		cout << "Please enter the computer(s) ID you want to choose (xxxx): ";
+		getline(cin, computerID);
+		for (char i : computerID) {
+			if (!isdigit(i)) computerID += "filler";
+		}
+		if (computerID.length() != 4) {
+			cout << "Invalid input, please try again.\n";
+			continue;
+		}
+		bool found = false;
+		for (auto i : computerHolder) {
+			if (i.first == computerID) {
 				found = true;
 				break;
 			}
@@ -1122,14 +1294,15 @@ void adminMenu() {
 	cout << "|1. Number of books                 |\n"; // Done
 	cout << "|2. Store data into other file      |\n"; // Done
     cout << "|3. View all books                  |\n"; // Done
-	cout << "|4. View all accounts               |\n"; // Done
-	cout << "|5. Find book                       |\n"; // Done
-    cout << "|6. View book borrower(s)           |\n"; // Done
-	cout << "|7. Report book's issue             |\n"; // Done
-	cout << "|8. Add book(s)                     |\n"; // Done
-	cout << "|9. Move book(s) to another place   |\n"; // Done
-	cout << "|10. Create an account              |\n"; // Done
-	cout << "|11. Exit                           |\n"; // Done
+	cout << "|4. View all available computers    |\n"; // Done
+	cout << "|5. View all accounts               |\n"; // Done
+	cout << "|6. Find book                       |\n"; // Done
+    cout << "|7. View book borrower(s)           |\n"; // Done
+	cout << "|8. Report item's issue             |\n"; // Done
+	cout << "|9. Add item(s)                     |\n"; // Done
+	cout << "|10. Move item to another place     |\n"; // Done
+	cout << "|11. Create an account              |\n"; // Done
+	cout << "|12. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
 
@@ -1137,12 +1310,14 @@ void userMenu() {
     cout << "\n";
 	cout << "============== Library ==============\n";
 	cout << "|1. View all books                  |\n"; // Done
-	cout << "|2. Find book                       |\n"; // Done
-    cout << "|3. Report book's issue             |\n"; // Done
-	cout << "|4. Borrow book (s)                 |\n"; // Done
-	cout << "|5. Return book (s)                 |\n"; // Done
-    cout << "|6. Profile                         |\n"; // Undone
-	cout << "|7. Exit                            |\n"; // Done
+	cout << "|2. View all available computers    |\n"; // Done
+	cout << "|3. Find book                       |\n"; // Done
+    cout << "|4. Report book's issue             |\n"; // Done
+	cout << "|5. Borrow book (s)                 |\n"; // Done
+	cout << "|6. Return book (s)                 |\n"; // Done
+	cout << "|7. Rent computer                   |\n"; // Done
+    cout << "|8. Profile                         |\n"; // Undone
+	cout << "|9. Exit                            |\n"; // Done
 	cout << "=====================================\n";
 }
 
