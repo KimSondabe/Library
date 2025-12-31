@@ -124,20 +124,24 @@ class Computers : public LibraryItems {
 class Account{
 	private:
 		string index;
-		string username;
+		string mail;
 		string password;
+		string studentID;
+		string username;
 		string role;
 	public:
         /* ======== Constructor ======== */
-		Account(string index, string username, string password, string role)
-        : index(index), username(username), password(password), role(role) {}
+		Account(string index, string mail, string password, string studentID, string username, string role)
+        : index(index), mail(mail), password(password), studentID(studentID), username(username), role(role) {}
         /* ======== Constructor ======== */
 
 		/* ======== Getters ========*/
+		string getMail() {return mail;}
 		string getUser() {return username;}
 		string getPass() {return password;}
 		string getRole() {return role;}
 		string getIndex() {return index;}
+		string getStudentID() {return studentID;}
 		/* ======== Getters ========*/
 		
 		/* ======== Setters ========*/
@@ -145,6 +149,8 @@ class Account{
 		void setPass(string pass) {password = pass;}
 		void setAdmin(string r) {role = r;}
 		void setIndex(int i) {index = i;}
+		void setMail(string m) {mail = m;}
+		void setStudentID(string id) {studentID = id;}
 		/* ======== Setters ========*/
 
 };
@@ -179,10 +185,10 @@ void viewBorrowedUsers(Library &lib); // View users who borrowed a specific book
 void rentComputer(Library &lib); // Rent computer(s)
 
 // Account Main Function
-bool CheckPass(vector<Account> &Acc, string username, string password); //Check password
-bool CheckUser(vector<Account> &Acc, string username); //Check if username existed
-string getIndexAcc(vector<Account> &Acc, string &username, string &password); //Get account index
-bool isAdmin(vector<Account> &Acc, string index); //Check if the account is a admin
+bool CheckPass(vector<Account> &Acc, string mail, string password); //Check password
+bool CheckUser(vector<Account> &Acc, string mail); //Check if mail existed
+int getIndexAcc(vector<Account> &Acc, string &mail, string &password); //Get account index
+bool isAdmin(vector<Account> &Acc, int index); //Check if the account is a admin
 void CreateAcc(vector<Account> &Acc); // Create Acc
 void DisplayAcc(vector<Account> &Acc); //Display Acc
 
@@ -211,7 +217,7 @@ string getIntInput(string str); //Get user input
 int main() {
     // Variables Declaration (If need more, declare in specific functions)
     bool status = true;
-	string username, password;
+	string mail, password;
 	Library lib;
     
 	// Today's date
@@ -224,26 +230,26 @@ int main() {
 
 	// Read data from file
 	ReadFile(lib);
-	
-	// Login interface
+
+		// Login interface
 	do {
-		cout << "Username: "; 
-		getline(cin, username);
+		cout << "Mail: "; 
+		getline(cin, mail);
 		cout << "Password: "; 
 		getline(cin, password);
-		if(CheckPass(lib.Acc, username, password)) {
+		if(CheckPass(lib.Acc, mail, password)) {
 			cout << "Successfully!\n";
 			break;
 		}
 		else{
-			cout << "Wrong username or password, please try again\n";
+			cout << "Wrong mail or password, please try again\n";
 		}
 	} while(true);
 
 	// Main interface
 	status = true;
     while(status) {
-		if(isAdmin(lib.Acc, getIndexAcc(lib.Acc, username, password))) {
+		if(isAdmin(lib.Acc, getIndexAcc(lib.Acc, mail, password))) {
 			adminMenu();
 			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1: { 
@@ -384,10 +390,10 @@ int main() {
 
 //Book Main Function
 void ReadFile(Library &lib) {
-	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[4], computerInfoList[4];
+	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[6], computerInfoList[4];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
-	// account list: index(0), username(1), password(2), role(3).
+	// account list: index(0), mail(1), password(2),studentID(4), username(5), role(6).
 	// computer info list: id(0), spec(1), level(2), zone(3).
 	vector<customerInfo> customerList;
 	lib.bookHolder.clear();
@@ -425,12 +431,12 @@ void ReadFile(Library &lib) {
             continue;
         }
         stringstream ss(buffer);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 6; i++) {
 			getline(ss, buffer, '|');
 			accountList[i] = buffer;
 		}
 		if(accountList[0] != "") {
-			Account acc(accountList[0], accountList[1], accountList[2], accountList[3]);
+			Account acc(accountList[0], accountList[1], accountList[2], accountList[3], accountList[4], accountList[5]);
 			lib.Acc.push_back(acc);
 		}
 	}
@@ -573,7 +579,7 @@ void Write(Library &lib, bool writeToBooks, bool writeToCopy, bool writeToBorrow
 		ofstream accFile("txt/account.txt");
 		
 		for(auto i : lib.Acc) {
-			accFile << i.getIndex() << "|" << i.getUser() << "|" << i.getPass() << "|" << i.getRole() << "|\n";
+			accFile << i.getIndex() << "|" << i.getMail() << "|" << i.getPass() << "|" << i.getStudentID() << "|" << i.getUser() << "|" << i.getRole() << "|\n";
 		}
 		accFile.close();
 		cout << " \"account.txt\"";
@@ -1070,9 +1076,9 @@ bool customerIDchecker(string &customerID) {
 
 //Account Function 
 
-bool CheckPass(vector<Account> &Acc, string username, string password) {
+bool CheckPass(vector<Account> &Acc, string mail, string password) {
 	for(int i = 0; i < (int) Acc.size(); i++) {
-		if(username == Acc[i].getUser()) {
+		if(mail == Acc[i].getMail()) {
 			if(password == Acc[i].getPass()) {
 				return true; //Check acccount when sign in 
 			}
@@ -1082,24 +1088,23 @@ bool CheckPass(vector<Account> &Acc, string username, string password) {
 	return false;
 }
 
-string getIndexAcc(vector<Account> &Acc, string &username, string &password) {
+int getIndexAcc(vector<Account> &Acc, string &mail, string &password) {
 	for(int i = 0; i < (int) Acc.size(); i++) {
-		if((username == Acc[i].getUser()) && (password == Acc[i].getPass())) {
-			return to_string(i);
+		if((mail == Acc[i].getMail()) && (password == Acc[i].getPass())) {
+			return i;
 		}
 	}
-	return "";
+	return 0;
 }
 
-bool isAdmin(vector<Account> &Acc, string index) {
-	int i = stoi(index);
-	if(Acc[i].getRole() == "admin") {return true;}
+bool isAdmin(vector<Account> &Acc, int index) {
+	if(Acc[index].getRole() == "admin") {return true;}
 	return false;
 }
 
-bool CheckUser(vector<Account> &Acc, string username) {
+bool CheckUser(vector<Account> &Acc, string mail) {
 	for(int i = 0; i < (int) Acc.size(); i++) {
-		if(username == Acc[i].getUser()) {
+		if(mail == Acc[i].getMail()) {
 			return true;
 		}
 	}
@@ -1107,20 +1112,24 @@ bool CheckUser(vector<Account> &Acc, string username) {
 }
 
 void CreateAcc(vector<Account> &Acc) {
-	string username, password, role;
+	string username, password, role, mail, studentID;
 	do{
-		cout << "Create account\n";
-		cout << "Username: "; 
-		getline(cin, username);
+		cout << "=======Create account======\n";
+		cout << "Mail: "; 
+		getline(cin, mail);
 		cout << "Password: "; 
 		getline(cin, password);
-		if(CheckUser(Acc, username)) {
-			cout << "Existed Username\n";
+		cout << "Username: "; 
+		getline(cin, username);
+		cout << "Student ID: ";
+		getline(cin, studentID);
+		if(CheckUser(Acc, mail)) {
+			cout << "Existed Mail\n";
 		}
 		else{
 			cout << "Account's Role: "; 
 			getline(cin, role);
-			Account acc(to_string(1 + Acc.size()),username, password, role);
+			Account acc(to_string(1 + Acc.size()), mail, password, studentID, username, role);
 			Acc.push_back(acc);			
 			break;
 		}
@@ -1130,7 +1139,7 @@ void CreateAcc(vector<Account> &Acc) {
 
 void DisplayAcc(vector<Account> &Acc) {
 	for(int i = 0; i < (int) Acc.size(); i++) {
-		cout << Acc[i].getIndex() << "|" << Acc[i].getUser() << "|" << Acc[i].getPass() <<"|"<< Acc[i].getRole() << "|\n";
+		cout << Acc[i].getIndex() << "|" << Acc[i].getMail() << "|" << Acc[i].getPass() <<"|"<< Acc[i].getStudentID() << "|" << Acc[i].getUser() << "|" << Acc[i].getRole() << "|\n";
 	}
 }
 
