@@ -161,6 +161,7 @@ typedef struct {
 	map<string, Computers> computerHolder;
 	vector<Account> Acc;
 	string today;
+	int currentAcc;
 } Library;
 
 /*======= Declare Function =======*/
@@ -212,6 +213,7 @@ void idInputChecker(map<string, Computers> &computerHolder, string &inputString)
 void adminMenu();//UI Admin's Menu
 void userMenu();//UI User's Menu
 string getIntInput(string str); //Get user input
+void Profile(Library &lib); //Display profile information
 
 /*========MAIN PROGRAM=======*/
 int main() {
@@ -246,10 +248,12 @@ int main() {
 		}
 	} while(true);
 
+	lib.currentAcc = getIndexAcc(lib.Acc, mail, password);
+
 	// Main interface
 	status = true;
     while(status) {
-		if(isAdmin(lib.Acc, getIndexAcc(lib.Acc, mail, password))) {
+		if(isAdmin(lib.Acc, lib.currentAcc)) {
 			adminMenu();
 			switch(stoi(getIntInput("Enter your choice: "))) {
 				case 1: { 
@@ -368,7 +372,7 @@ int main() {
 					break;
 				}
 				case 8:{
-					// In progress...
+					Profile(lib);
 					break;
 				}
 				case 9:{
@@ -802,7 +806,6 @@ void Borrow(Library &lib) {
 	string bookID, buffer;
 	idInputChecker(lib.bookHolder, bookID);
 	vector<string> customerIDlist;
-    
 	// Find the book in bookHolder
 	if (lib.bookHolder[bookID].getQuantity() == 0) {
 		cout << "Sorry, this book is out of stock!\n";
@@ -810,19 +813,8 @@ void Borrow(Library &lib) {
 	}
 	// Get customer info
 	customerInfo newCustomer;
-	cout << "Please provide your information to borrow the book.\n";
-	cout << "Enter your name: ";
-	do {
-		getline(cin, buffer);
-	} while(!capitalizeWords(buffer));
-	newCustomer.name = buffer;
-
-	cout << "Enter your ID: ";
-	do {
-		getline(cin, buffer);
-	} while (!customerIDchecker(buffer));
-	newCustomer.customerID = buffer;
-
+	newCustomer.name = lib.Acc.at(lib.currentAcc).getUser();
+	newCustomer.customerID = lib.Acc.at(lib.currentAcc).getStudentID();
 	newCustomer.borrowDay = lib.today;
 	// Check if customer has already borrowed this book
 	for (int i = 0; i < (int) lib.bookHolder[bookID].customerList.size(); i++) {
@@ -831,13 +823,7 @@ void Borrow(Library &lib) {
 			return;
 		}
 	}
-
-	cout << "Enter your student mail: ";
-	do {
-		getline(cin, buffer);
-		if ((buffer != "") && (buffer.find("@sis.hust.edu.vn") != string::npos)) break;
-	} while (true);
-	newCustomer.customerMail = buffer;
+	newCustomer.customerMail = lib.Acc.at(lib.currentAcc).getMail();
 
 	lib.bookHolder[bookID].customerList.push_back(newCustomer);
 	// Ask for quantity to borrow
@@ -872,18 +858,8 @@ void Return(Library &lib) {
 	for (int i = 0; i < originalBorrowedHolderSize; i++) {
 		if (lib.borrowedHolder[i].bookID == bookID) {
 			customerInfo returnCustomer;
-	
-			cout << "Enter your customer name: ";
-			do {
-				getline(cin, buffer);
-			} while(!capitalizeWords(buffer));
-			returnCustomer.name = buffer;
-
-			cout << "Enter your ID: ";
-			do {
-				getline(cin, buffer);
-			} while (!customerIDchecker(buffer));
-			returnCustomer.customerID = buffer;
+			returnCustomer.name = lib.Acc.at(lib.currentAcc).getUser();
+			returnCustomer.customerID = lib.Acc.at(lib.currentAcc).getStudentID();
 
 			// Check if customer info matches
 			if (lib.borrowedHolder[i].info.name != returnCustomer.name || lib.borrowedHolder[i].info.customerID != returnCustomer.customerID) {
@@ -1348,4 +1324,13 @@ string getIntInput(string str) {
 		}
 	} while (!isNumber);
     return input;
+}
+
+void Profile(Library &lib) {
+	cout << "\n===== Your Profile =====\n";
+	cout << "Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
+	cout << "Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
+	cout << "Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
+	cout << "Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
+	cout << "========================\n";
 }
