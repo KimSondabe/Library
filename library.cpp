@@ -1089,16 +1089,28 @@ bool CheckUser(vector<Account> &Acc, string mail) {
 
 void CreateAcc(vector<Account> &Acc) {
 	string username, password, role, mail, studentID;
+	string buffer;
 	do{
 		cout << "=======Create account======\n";
-		cout << "Mail: "; 
+		cout << "Email (must be @sis.hust.edu.vn): ";
+		do {
 		getline(cin, mail);
+		if ((mail != "") && (mail.find("@sis.hust.edu.vn") != string::npos)) break;
+		} while (true);
 		cout << "Password: "; 
-		getline(cin, password);
+		do{
+			getline(cin, password);
+			if (password != "") break;
+		}while(true);
 		cout << "Username: "; 
-		getline(cin, username);
-		cout << "Student ID: ";
-		getline(cin, studentID);
+		do{
+			getline(cin, username);
+			if(capitalizeWords(username)) break;
+		}while(true);
+		do{
+			studentID = getIntInput("Student ID must be 8 digits (20200000 - 20309999): ");
+			if((stoi(studentID) > 20200000) && (stoi(studentID) < 20309999)) break;
+		}while(true);
 		if(CheckUser(Acc, mail)) {
 			cout << "Existed Mail\n";
 		}
@@ -1327,10 +1339,10 @@ string getIntInput(string str) {
 }
 
 void Profile(Library &lib) {
-	cout << "\n===== Your Profile =====\n";
-	cout << "Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
-	cout << "Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
-	cout << "Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
-	cout << "Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
+	cout << "\n======== Your Profile ========\n";
+	cout << "|Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
+	cout << "|Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
+	cout << "|Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
+	cout << "|Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
 	cout << "========================\n";
 }
