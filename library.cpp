@@ -219,6 +219,7 @@ void Profile(Library &lib); //Display profile information
 int main() {
     // Variables Declaration (If need more, declare in specific functions)
     bool status = true;
+	bool open = true;
 	string mail, password;
 	Library lib;
     
@@ -233,160 +234,176 @@ int main() {
 	// Read data from file
 	ReadFile(lib);
 
-		// Login interface
-	do {
-		cout << "Mail: "; 
-		getline(cin, mail);
-		cout << "Password: "; 
-		getline(cin, password);
-		if(CheckPass(lib.Acc, mail, password)) {
-			cout << "Successfully!\n";
-			break;
-		}
-		else{
-			cout << "Wrong mail or password, please try again\n";
-		}
-	} while(true);
+	// Login interface
+	cout << "===== Welcome to Ta Quang Buu Library =====\n";
+	while(open){
+		do {
+			cout << "Mail: "; 
+			getline(cin, mail);
+			cout << "Password: "; 
+			getline(cin, password);
+			if(CheckPass(lib.Acc, mail, password)) {
+				cout << "Successfully!\n";
+				break;
+			}
+			else{
+				cout << "Wrong mail or password, please try again\n";
+			}
+		} while(true);
 
-	lib.currentAcc = getIndexAcc(lib.Acc, mail, password);
+		lib.currentAcc = getIndexAcc(lib.Acc, mail, password);
 
-	// Main interface
-	status = true;
-    while(status) {
-		if(isAdmin(lib.Acc, lib.currentAcc)) {
-			adminMenu();
-			switch(stoi(getIntInput("Enter your choice: "))) {
-				case 1: { 
-					CountBooks(lib);
-					break;
-				}
-
-				case 2: {
-					Write(lib, false, true, false, false, false);
-					break;
-				}
-
-				case 3: {
-					View(lib, "books");
-					break;
-				}
-				case 4: {
-					View(lib, "computers");
-					break;
-				}
-				case 5: {
-					DisplayAcc(lib.Acc);
-					break;
-				}
-
-				case 6: {
-					FindBooks(lib);
-					if (lib.foundedBook.empty()) {
-						cout << "There are no book match with your search!\n";
-						break;
-					}
-					cout << "The book(s) you want to search for are:\n";
-					for (auto i : lib.foundedBook) {
-						cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
-						<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
-					}
-					break;
-				}
-				
-				case 7: {
-					viewBorrowedUsers(lib);
-					break;
-				}
-				case 8: {
-					ReportBooks(lib);
-					break;
-				}
-
-				case 9: {
-					Add(lib);
-					break;
-				}
-
-				case 10: {
-					MoveItem(lib);
-					break;
-				}
-
-				case 11:{
-					CreateAcc(lib.Acc);
-					break;
-				}
-
-				case 12: {
-					Write(lib, true, false, true, true, true);
-					cout << "Exiting program...\n";
-					status = false;
-					break;
-				}
-
-				default: {
-					cout << "Invalid syntax, please retry!\n";
-				}
-        	}
-		}
-
-		else {
-			userMenu();
-			switch(stoi(getIntInput("Enter your choice: "))) {
-				case 1:{
-					View(lib, "books");
-					break;
-				}
-				case 2:{
-					View(lib, "computers");
-					break;
-				}
-				case 3:{
-					FindBooks(lib);
-					if (lib.foundedBook.empty()) {
-						cout << "There are no book match with your search!\n";
+		// Main interface
+		status = true;
+		while(status) {
+			if(isAdmin(lib.Acc, lib.currentAcc)) {
+				adminMenu();
+				switch(stoi(getIntInput("Enter your choice: "))) {
+					case 1: { 
+						CountBooks(lib);
 						break;
 					}
 
-					cout << "The book(s) you want to search for are:\n";
-					for (auto i : lib.foundedBook) {
-						cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
-						<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
+					case 2: {
+						Write(lib, false, true, false, false, false);
+						break;
 					}
-					break;	
+
+					case 3: {
+						View(lib, "books");
+						break;
+					}
+					case 4: {
+						View(lib, "computers");
+						break;
+					}
+					case 5: {
+						DisplayAcc(lib.Acc);
+						break;
+					}
+
+					case 6: {
+						FindBooks(lib);
+						if (lib.foundedBook.empty()) {
+							cout << "There are no book match with your search!\n";
+							break;
+						}
+						cout << "The book(s) you want to search for are:\n";
+						for (auto i : lib.foundedBook) {
+							cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
+							<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
+						}
+						break;
+					}
+					
+					case 7: {
+						viewBorrowedUsers(lib);
+						break;
+					}
+					case 8: {
+						ReportBooks(lib);
+						break;
+					}
+
+					case 9: {
+						Add(lib);
+						break;
+					}
+
+					case 10: {
+						MoveItem(lib);
+						break;
+					}
+
+					case 11:{
+						CreateAcc(lib.Acc);
+						break;
+					}
+
+					case 12:{
+						Write(lib, true, false, true, true, true);
+						status = false;
+						break;
+					}
+
+					case 13: {
+						Write(lib, true, false, true, true, true);
+						cout << "Exiting program...\n";
+						status = false;
+						open = false;
+						break;
+					}
+
+					default: {
+						cout << "Invalid syntax, please retry!\n";
+					}
 				}
-				case 4:{
-					ReportBooks(lib);
-					break;
-				}
-				case 5:{
-					Borrow(lib);
-					break;
-				}
-				case 6:{
-					Return(lib);
-					break;
-				}
-				case 7:{
-					rentComputer(lib);
-					break;
-				}
-				case 8:{
-					Profile(lib);
-					break;
-				}
-				case 9:{
-					Write(lib, true, false, true, true, true);
-					cout << "Thanks for coming to our library! Have a nice day!\n";
-					status = false;
-					break;
-				}
-				default: {
-					cout << "Invalid syntax, please retry!\n";
+			}
+
+			else {
+				userMenu();
+				switch(stoi(getIntInput("Enter your choice: "))) {
+					case 1:{
+						View(lib, "books");
+						break;
+					}
+					case 2:{
+						View(lib, "computers");
+						break;
+					}
+					case 3:{
+						FindBooks(lib);
+						if (lib.foundedBook.empty()) {
+							cout << "There are no book match with your search!\n";
+							break;
+						}
+
+						cout << "The book(s) you want to search for are:\n";
+						for (auto i : lib.foundedBook) {
+							cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor() << " with " << i.second.getQuantity()
+							<< " books in level \'" << i.second.getLevel() << "\' and zone \'" << i.second.getZone() << "\'!\n"; 
+						}
+						break;	
+					}
+					case 4:{
+						ReportBooks(lib);
+						break;
+					}
+					case 5:{
+						Borrow(lib);
+						break;
+					}
+					case 6:{
+						Return(lib);
+						break;
+					}
+					case 7:{
+						rentComputer(lib);
+						break;
+					}
+					case 8:{
+						Profile(lib);
+						break;
+					}
+					case 9:{
+						Write(lib, true, false, true, true, true);
+						status = false;
+						break;
+					}
+					case 10:{
+						Write(lib, true, false, true, true, true);
+						cout << "Thanks for coming to our library! Have a nice day!\n";
+						status = false;
+						open = false;
+						break;
+					}
+					default: {
+						cout << "Invalid syntax, please retry!\n";
+					}
 				}
 			}
 		}
-    }
+	}
     return 0;
 }
 
@@ -900,45 +917,49 @@ void Return(Library &lib) {
 
 void FindBooks(Library &lib) {
 	string choice, inputString;
-	do {
-		cout << "=============================================\n";
-		cout << "|Do you want to search by Title or Author  |\n";
-		cout << "|1. Title                                  |\n";
-		cout << "|2. Author                                 |\n";
-		cout << "=============================================\n";
-		choice = getIntInput("Enter your choice (1-2): ");
-	} while((choice != "1") && (choice != "2"));
+		do {
+			cout << "=============================================\n";
+			cout << "|FIND BOOK MENU                            |\n";
+			cout << "|1. Search book(s) by title                |\n";
+			cout << "|2. Search book(s) by author               |\n";
+			cout << "=============================================\n";
+			choice = getIntInput("Enter your choice (1-2): ");
+		} while((choice != "1") && (choice != "2"));
 
-	if (choice == "1") {
-		while(true) {
-			cout << "Title you want to search for: ";
-			getline(cin, inputString);
-			if (inputString != "") {
-				cout << "\n";
-				Find(lib, inputString, "", "Title");
-				break;
-			}
-			else {
-				cout << "Please try again.\n";
-			}
+		if (choice == "1") {
+			while(true) {
+                cout << "Title you want to search for: ";
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                getline(cin, inputString);
+                if (!inputString.empty()) {
+                    cout << "\n--- SEARCH RESULTS ---\n";
+                    Find(lib, inputString, "", "Title");
+                    cout << "\nPress Enter to continue...";
+                    cin.ignore(); 
+                    break;
+                } else {
+                    cout << "Please try again.\n";
+                }
+            }
+		}
+
+		else if (choice == "2") {
+			while(true) {
+                cout << "Author you want to search for: ";
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                getline(cin, inputString);
+                if (!inputString.empty()) {
+                    cout << "\n--- SEARCH RESULTS ---\n";
+                    Find(lib, "", inputString, "Author");
+                    cout << "\nPress Enter to continue...";
+                    cin.ignore(); 
+                    break;
+                } else {
+                    cout << "Please try again.\n";
+                }
+            }
 		}
 	}
-
-	else if (choice == "2") {
-		while(true) {
-			cout << "Author you want to search for: ";
-			getline(cin, inputString);
-			if (inputString != "") {
-				cout << "\n";
-				Find(lib, "", inputString, "Author");
-				break;
-			}
-			else {
-				cout << "Please try again.\n";
-			}
-		}	
-	}
-}
 
 void ReportBooks(Library &lib) {
 	string bookID, quantity;
@@ -1299,7 +1320,8 @@ void adminMenu() {
 	cout << "|9. Add item(s)                     |\n"; // Done
 	cout << "|10. Move item to another place     |\n"; // Done
 	cout << "|11. Create an account              |\n"; // Done
-	cout << "|12. Exit                           |\n"; // Done
+	cout << "|12. Return to sign in page         |\n"; // Done
+	cout << "|13. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
 
@@ -1314,7 +1336,8 @@ void userMenu() {
 	cout << "|6. Return book (s)                 |\n"; // Done
 	cout << "|7. Rent computer                   |\n"; // Done
     cout << "|8. Profile                         |\n"; // Undone
-	cout << "|9. Exit                            |\n"; // Done
+	cout << "|9. Return to sign in page          |\n"; // Done
+	cout << "|10. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
 
