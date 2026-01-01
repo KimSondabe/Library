@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
+#include <limits>
 
 using namespace std;
 
@@ -322,6 +323,7 @@ int main() {
 
 					case 12:{
 						Write(lib, true, false, true, true, true);
+						cout << "===== Welcome to Ta Quang Buu Library =====\n";
 						status = false;
 						break;
 					}
@@ -387,6 +389,7 @@ int main() {
 					}
 					case 9:{
 						Write(lib, true, false, true, true, true);
+						cout << "===== Welcome to Ta Quang Buu Library =====\n";
 						status = false;
 						break;
 					}

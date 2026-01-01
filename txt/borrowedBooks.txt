@@ -1,2 +1,20 @@
-0001|Tat Hung|001207009075|hung.nt2514819@sis.hust.edu.vn|15/12/2025||
-0002|Long|202514865|long.vn2514865@sis.hust.edu.vn|31/12/2025|8|
+0001|Nguyen Anh Duc|202411129|Duc.NA2411129@sis.hust.edu.vn|15/06/2025|2|
+0045|Phan Hoang Nam|202514410|Nam.PH2514410@sis.hust.edu.vn|22/07/2025|1|
+0012|Vu Ngoc Long|202514865|Long.VN2514865@sis.hust.edu.vn|05/08/2025|3|
+0087|Phan Tuyet Anh|202415902|Anh.PT2415902@sis.hust.edu.vn|12/06/2025|2|
+0023|Do Quang Minh|202312450|Minh.DQ2312450@sis.hust.edu.vn|30/09/2025|5|
+0056|Hoang Thi Lan|202416821|Lan.HT2416821@sis.hust.edu.vn|18/10/2025|2|
+0009|Nguyen Thu Trang|202519932|Trang.NT2519932@sis.hust.edu.vn|07/07/2025|1|
+0034|Pham Van Dung|202318841|Dung.PV2318841@sis.hust.edu.vn|25/11/2025|4|
+0015|Tran Linh Phuong|202417750|Phuong.TL2417750@sis.hust.edu.vn|14/08/2025|2|
+0100|Nguyen Minh Quan|202514432|Quan.NM2514432@sis.hust.edu.vn|02/12/2025|3|
+0067|Le Thi Hoa|202315567|Hoa.LT2315567@sis.hust.edu.vn|19/06/2025|1|
+0011|Duong Anh Tuan|202412289|Tuan.DA2412289@sis.hust.edu.vn|21/10/2025|2|
+0092|Ngo Thuy Linh|202513345|Linh.NT2513345@sis.hust.edu.vn|11/09/2025|2|
+0048|Hoang Huu Bach|202319901|Bach.HH2319901@sis.hust.edu.vn|08/07/2025|5|
+0025|Phung Thi Yen|202410021|Yen.PT2410021@sis.hust.edu.vn|27/12/2025|1|
+0078|Do Quoc Viet|202517782|Viet.DQ2517782@sis.hust.edu.vn|03/11/2025|3|
+0019|Vu Trung Kien|202316654|Kien.VT2316654@sis.hust.edu.vn|20/08/2025|4|
+0037|Nguyen Thi Thuy|202415543|Thuy.NT2415543@sis.hust.edu.vn|16/06/2025|2|
+0051|Phan Hoang Nam|202514410|Nam.PH2514410@sis.hust.edu.vn|29/09/2025|1|
+0002|Nguyen Anh Duc|202411129|Duc.NA2411129@sis.hust.edu.vn|13/12/2025|3|
