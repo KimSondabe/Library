@@ -205,7 +205,6 @@ int dayCounter(string start, string end); // Count number of days between two da
 string borrowDateCalculate(string start, int borrowDuration); // Calculate return date based on borrow date and duration
 
 //Book Function
-bool customerIDchecker(string &customerID); // Check valid customer ID input
 string idCounter(string prevID); // Generate next ID
 void idInputChecker(map<string, Books> &bookHolder, string &inputString); // Check valid book ID input
 void idInputChecker(map<string, Computers> &computerHolder, string &inputString); // Check valid computer ID input
@@ -414,7 +413,11 @@ int main() {
 
 //Book Main Function
 void ReadFile(Library &lib) {
-	string buffer, bookInfoList[7], borrowedInfoList[6], accountList[6], computerInfoList[4];
+	const int borrowedBooksCount = 6;
+	const int accountCount = 6;
+	const int bookInfoCount = 7;
+	const int computerInfoCount = 4;
+	string buffer, bookInfoList[bookInfoCount], borrowedInfoList[borrowedBooksCount], accountList[accountCount], computerInfoList[computerInfoCount];
 	// book info list: id (0), title(1), author(2), quantity(3), page(4), level(5), zone(6).
 	// borrowed info list: bookID(0), name(1), customerID(2), customerMail(3), borrowDay(4), borrowQuantity(5).
 	// account list: index(0), mail(1), password(2),studentID(4), username(5), role(6).
@@ -431,7 +434,7 @@ void ReadFile(Library &lib) {
             continue;
         }
         stringstream ss(buffer);
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < borrowedBooksCount; i++) {
 			getline(ss, buffer, '|');
 			borrowedInfoList[i] = buffer;
 		}
@@ -455,7 +458,7 @@ void ReadFile(Library &lib) {
             continue;
         }
         stringstream ss(buffer);
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < accountCount; i++) {
 			getline(ss, buffer, '|');
 			accountList[i] = buffer;
 		}
@@ -474,7 +477,7 @@ void ReadFile(Library &lib) {
             continue;
         }
         stringstream ss(buffer);
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < bookInfoCount; i++) {
 			getline(ss, buffer, '|');
 			bookInfoList[i] = buffer;
 		}
@@ -491,13 +494,14 @@ void ReadFile(Library &lib) {
 	}
 	file.close();
 
+	// Read computers file
 	ifstream computerFile("txt/computers.txt");
 	while (getline(computerFile, buffer)) {
 		if(buffer.empty()) {
 			continue;
 		}
 		stringstream ss(buffer);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < computerInfoCount; i++) {
 			getline(ss, buffer, '|');
 			computerInfoList[i] = buffer;
 		}
@@ -999,29 +1003,31 @@ void rentComputer(Library &lib) {
 
 }
 string idCounter(string prevID) {
-    if (prevID.size() != 4) return "";
+	int idBooklength = 4;
+    if (prevID.size() != idBooklength) return "";
     for (char c : prevID) { 
         if (!isdigit(c)) return "";
 	}
 	string upComingID = to_string((stoi(prevID) + 1));
-	if (upComingID.length() > 4) {
+	if (upComingID.length() > idBooklength) {
 		cout << "Out of storage!\n";
 		return "";
 	}
-	while(upComingID.length() < 4) {
+	while(upComingID.length() < idBooklength) {
 		upComingID = "0" + upComingID;
 	}
     return upComingID;
 }
 
 void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
+	int idBooklength = 4;
 	do {
 		cout << "Please enter the book(s) ID you want to choose (xxxx): ";
 		getline(cin, bookID);
 		for (char i : bookID) {
 			if (!isdigit(i)) bookID += "filler";
 		}
-		if (bookID.length() != 4) {
+		if (bookID.length() != idBooklength) {
 			cout << "Invalid input, please try again.\n";
 			continue;
 		}
@@ -1037,13 +1043,14 @@ void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
 	} while(true);
 }
 void idInputChecker(map<string, Computers> &computerHolder, string &computerID) {
+	int idComputerlength = 4;
 	do {
 		cout << "Please enter the computer(s) ID you want to choose (xxxx): ";
 		getline(cin, computerID);
 		for (char i : computerID) {
 			if (!isdigit(i)) computerID += "filler";
 		}
-		if (computerID.length() != 4) {
+		if (computerID.length() != idComputerlength) {
 			cout << "Invalid input, please try again.\n";
 			continue;
 		}
@@ -1058,21 +1065,6 @@ void idInputChecker(map<string, Computers> &computerHolder, string &computerID) 
 		cout << "Invalid input, please try again.\n";
 	} while(true);
 }
-
-bool customerIDchecker(string &customerID) {
-	if (customerID.length() != 12) {
-		cout << "Invalid input, please try again.\n";
-		return false;
-	}
-	for (char c : customerID) {
-		if (!isdigit(c)) {
-			cout << "Invalid input, please try again.\n";
-			return false;
-		}
-	}
-	return true;
-}
-
 
 //Account Function 
 
