@@ -641,9 +641,31 @@ void View(Library &lib, const string choice) {
 	if (choice == "books") {	
 		cout << "Here are the book titles\' list\n";
 		cout << "===================\n";
+        int bookIndex = 0;
 		for (auto i : lib.bookHolder) {
 			cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
 			<< " with " << i.second.getQuantity() << " books.\n";
+            bookIndex++;
+            if (bookIndex == 10) {
+                cout << "Do you want to show 10 next book\n";
+                cout << "1.Yes\n";
+                cout << "2.No\n";
+                string selection;
+                getline(cin, selection);
+                while(selection != "1" && selection != "2") {
+                    cout << "Invalid\n";
+                    cout << "Do you want to show 10 next book\n";
+                    cout << "1.Yes\n";
+                    cout << "2.No\n";
+                    getline(cin, selection);
+                }
+                if (selection == "1") {
+                    bookIndex = 0;
+                }else {
+                    break;
+                }
+                
+            }
 		}
 		cout << "==================\n";
 	}
