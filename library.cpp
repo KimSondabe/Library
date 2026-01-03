@@ -182,6 +182,7 @@ void MoveItem(Library &lib); // Move item(s)
 void FindBooks(Library &lib); // Find Feature
 void ReportBooks(Library &lib); //Report books' issues
 void viewBorrowedUsers(Library &lib); // View users who borrowed a specific book
+void ViewBorrowedBook(Library &lib); // View borrowed books by current user
 
 // Computer Features Functions
 void rentComputer(Library &lib); // Rent computer(s)
@@ -193,6 +194,7 @@ int getIndexAcc(vector<Account> &Acc, string &mail, string &password); //Get acc
 bool isAdmin(vector<Account> &Acc, int index); //Check if the account is a admin
 void CreateAcc(vector<Account> &Acc); // Create Acc
 void DisplayAcc(vector<Account> &Acc); //Display Acc
+void Profile(Library &lib); //Display profile information
 
 //General Function
 string lowerCase(string str); // Convert string to lower case
@@ -213,7 +215,6 @@ void idInputChecker(map<string, Computers> &computerHolder, string &inputString)
 void adminMenu();//UI Admin's Menu
 void userMenu();//UI User's Menu
 string getIntInput(string str); //Get user input
-void Profile(Library &lib); //Display profile information
 
 /*========MAIN PROGRAM=======*/
 int main() {
@@ -388,16 +389,20 @@ int main() {
 						break;
 					}
 					case 8:{
-						Profile(lib);
+						ViewBorrowedBook(lib);
 						break;
 					}
 					case 9:{
+						Profile(lib);
+						break;
+					}
+					case 10:{
 						Write(lib, true, false, true, true, true);
 						cout << "===== Welcome to Ta Quang Buu Library =====\n";
 						status = false;
 						break;
 					}
-					case 10:{
+					case 11:{
 						Write(lib, true, false, true, true, true);
 						cout << "Thanks for coming to our library! Have a nice day!\n";
 						status = false;
@@ -1120,6 +1125,18 @@ void idInputChecker(map<string, Computers> &computerHolder, string &computerID) 
 	} while(true);
 }
 
+void ViewBorrowedBook(Library &lib){
+	cout << "================================================\n";
+	cout << "Here are the borrowed book(s) list\n";
+	for(int i = 0; i < (int) lib.borrowedHolder.size(); i++){
+		if(lib.borrowedHolder[i].info.customerID == lib.Acc.at(lib.currentAcc).getStudentID()){
+			cout << lib.borrowedHolder[i].bookID << "|" << lib.bookHolder.find(lib.borrowedHolder[i].bookID)->second.getTitle() << "|" 
+			<< lib.bookHolder.find(lib.borrowedHolder[i].bookID)->second.getAuthor() << "|" << lib.borrowedHolder[i].borrowQuantity << "\n";
+		}
+	}
+	cout << "================================================\n";
+}
+
 //Account Function 
 
 bool CheckPass(vector<Account> &Acc, string mail, string password) {
@@ -1224,6 +1241,15 @@ void DisplayAcc(vector<Account> &Acc) {
                 }
 		}
 	}
+}
+
+void Profile(Library &lib) {
+	cout << "\n================ Your Profile =================\n";
+	cout << "|Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
+	cout << "|Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
+	cout << "|Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
+	cout << "|Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
+	cout << "================================================\n";
 }
 
 //General Function 
@@ -1410,9 +1436,10 @@ void userMenu() {
 	cout << "|5. Borrow book (s)                 |\n"; // Done
 	cout << "|6. Return book (s)                 |\n"; // Done
 	cout << "|7. Rent computer                   |\n"; // Done
-    cout << "|8. Profile                         |\n"; // Done
-	cout << "|9. Return to sign in page          |\n"; // Done
-	cout << "|10. Exit                           |\n"; // Done
+	cout << "|8. View borrowed books             |\n"; // Done
+    cout << "|9. Profile                         |\n"; // Done
+	cout << "|10. Return to sign in page         |\n"; // Done
+	cout << "|11. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
 
@@ -1434,13 +1461,4 @@ string getIntInput(string str) {
 		}
 	} while (!isNumber);
     return input;
-}
-
-void Profile(Library &lib) {
-	cout << "\n================ Your Profile ================\n";
-	cout << "|Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
-	cout << "|Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
-	cout << "|Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
-	cout << "|Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
-	cout << "================================================\n";
 }
