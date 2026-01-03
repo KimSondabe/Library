@@ -1131,7 +1131,8 @@ void ViewBorrowedBook(Library &lib){
 	for(int i = 0; i < (int) lib.borrowedHolder.size(); i++){
 		if(lib.borrowedHolder[i].info.customerID == lib.Acc.at(lib.currentAcc).getStudentID()){
 			cout << lib.borrowedHolder[i].bookID << "|" << lib.bookHolder.find(lib.borrowedHolder[i].bookID)->second.getTitle() << "|" 
-			<< lib.bookHolder.find(lib.borrowedHolder[i].bookID)->second.getAuthor() << "|" << lib.borrowedHolder[i].borrowQuantity << "\n";
+			<< lib.bookHolder.find(lib.borrowedHolder[i].bookID)->second.getAuthor() << "|" << lib.borrowedHolder[i].borrowQuantity << "|" 
+			<< lib.borrowedHolder[i].info.borrowDay << "|\n";
 		}
 	}
 	cout << "================================================\n";
