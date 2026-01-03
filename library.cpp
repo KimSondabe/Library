@@ -190,6 +190,7 @@ void rentComputer(Library &lib); // Rent computer(s)
 // Account Main Function
 bool CheckPass(vector<Account> &Acc, string mail, string password); //Check password
 bool CheckUser(vector<Account> &Acc, string mail); //Check if mail existed
+bool CheckStudentID(vector<Account> &Acc, string studentID); //Check if studentID existed
 int getIndexAcc(vector<Account> &Acc, string &mail, string &password); //Get account index
 bool isAdmin(vector<Account> &Acc, int index); //Check if the account is a admin
 void CreateAcc(vector<Account> &Acc); // Create Acc
@@ -650,7 +651,7 @@ void CountBooks(Library &lib) {
 void View(Library &lib, const string choice) {
 	if (choice == "books") {	
 		cout << "Here are the book titles\' list\n";
-		cout << "============================================\n";
+		cout << "===============================================\n";
         int bookIndex = 0;
 		for (auto i : lib.bookHolder) {
 			cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
@@ -991,41 +992,35 @@ void FindBooks(Library &lib) {
 			cout << "=============================================\n";
 			choice = getIntInput("Enter your choice (1-2): ");
 		} while((choice != "1") && (choice != "2"));
-
 		if (choice == "1") {
 			while(true) {
-                cout << "Title you want to search for: ";
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                getline(cin, inputString);
-                if (!inputString.empty()) {
-                    cout << "\n--- SEARCH RESULTS ---\n";
-                    Find(lib, inputString, "", "Title");
-                    cout << "\nPress Enter to continue...";
-                    cin.ignore(); 
-                    break;
-                } else {
-                    cout << "Please try again.\n";
-                }
-            }
+				cout << "Title you want to search for: ";
+				getline(cin, inputString);
+				if (inputString != "") {
+					cout << "\n";
+					Find(lib, inputString, "", "Title");
+					break;
+				}
+				else {
+					cout << "Please try again.\n";
+				}
+			}
 		}
-
 		else if (choice == "2") {
 			while(true) {
-                cout << "Author you want to search for: ";
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                getline(cin, inputString);
-                if (!inputString.empty()) {
-                    cout << "\n--- SEARCH RESULTS ---\n";
-                    Find(lib, "", inputString, "Author");
-                    cout << "\nPress Enter to continue...";
-                    cin.ignore(); 
-                    break;
-                } else {
-                    cout << "Please try again.\n";
-                }
-            }
-		}
+				cout << "Author you want to search for: ";
+				getline(cin, inputString);
+				if (inputString != "") {
+					cout << "\n";
+					Find(lib, "", inputString, "Author");
+					break;
+				}
+				else {
+					cout << "Please try again.\n";
+				}
+			}	
 	}
+}
 
 void ReportBooks(Library &lib) {
 	string bookID, quantity;
@@ -1162,7 +1157,7 @@ int getIndexAcc(vector<Account> &Acc, string &mail, string &password) {
 }
 
 bool isAdmin(vector<Account> &Acc, int index) {
-	if(Acc[index].getRole() == "admin") {return true;}
+	if(Acc[index].getRole() == "Admin") {return true;}
 	return false;
 }
 
@@ -1175,41 +1170,43 @@ bool CheckUser(vector<Account> &Acc, string mail) {
 	return false;
 }
 
+bool CheckStudentID(vector<Account> &Acc, string studentID) {
+	for(int i = 0; i < (int) Acc.size(); i++) {
+		if(studentID == Acc[i].getStudentID()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void CreateAcc(vector<Account> &Acc) {
 	string username, password, role, mail, studentID;
 	string buffer;
+	cout << "=======Create account======\n";
+	cout << "Email (must be @sis.hust.edu.vn): ";
+	do {
+	getline(cin, mail);
+	if ((mail != "") && (mail.find("@sis.hust.edu.vn") != string::npos) && (CheckUser(Acc, mail) == false)) break;
+	} while (true);
+	cout << "Password: "; 
 	do{
-		cout << "=======Create account======\n";
-		cout << "Email (must be @sis.hust.edu.vn): ";
-		do {
-		getline(cin, mail);
-		if ((mail != "") && (mail.find("@sis.hust.edu.vn") != string::npos)) break;
-		} while (true);
-		cout << "Password: "; 
-		do{
-			getline(cin, password);
-			if (password != "") break;
-		}while(true);
-		cout << "Username: "; 
-		do{
-			getline(cin, username);
-			if(capitalizeWords(username)) break;
-		}while(true);
-		do{
-			studentID = getIntInput("Student ID must be 8 digits (20200000 - 20309999): ");
-			if((stoi(studentID) > 20200000) && (stoi(studentID) < 20309999)) break;
-		}while(true);
-		if(CheckUser(Acc, mail)) {
-			cout << "Existed Mail\n";
-		}
-		else{
-			cout << "Account's Role: "; 
-			getline(cin, role);
-			Account acc(to_string(1 + Acc.size()), mail, password, studentID, username, role);
-			Acc.push_back(acc);			
-			break;
-		}
+		getline(cin, password);
+		if (password != "") break;
 	}while(true);
+	cout << "Username: "; 
+	do{
+		getline(cin, username);
+	}while(!capitalizeWords(username));
+	do{
+		studentID = getIntInput("Student ID must be 9 digits (202000000 - 203099999): ");
+		if((stoi(studentID) > 202000000) && (stoi(studentID) < 203099999) && (CheckStudentID(Acc, studentID) == false)) break;
+	}while(true);
+	cout << "Account's Role (Admin/User): "; 
+	do {
+		getline(cin, role);
+	}while(!capitalizeWords(role));
+	Account acc(to_string(1 + Acc.size()), mail, password, studentID, username, role);
+	Acc.push_back(acc);			
 	cout << "====Create account successfully ====\n";
 }
 

@@ -1,8 +1,58 @@
-Thông tin cơ bản cthu cthu về cái thư viện
-- Thư viện gồm 7 tầng (level), mỗi tầng có 5 khu (zone) từ A - E
-- Thư viện có nhiều vật phẩm (class bố: LibraryItem) và trong đó có sách ở tầng 1-5
-(class kế thừa: Books), trong đó sách có thể cho mượn, tìm kiếm (?),... ngoài ra còn có
-máy tính bàn từ tầng 5-7 (class kế thừa: Computer) có  thể cho thuê,... (đẻ ra đc j thì thêm)
-- Mô tả các tính năng:
-+ ....
-+ ....
+========================================
+|                                      |
+|         TA QUANG BUU LIBRARY         |
+|                                      |
+========================================
+
+1. Tổng quan
++ Cấu trúc: Thư viện gồm 7 tầng và 5 khu vực (từ A đến E) dùng để lưu trữ các vật phẩm (Base Class: LibraryItem).
++ Phân loại: Tầng 1-5 chứa sách (Subclass: Book), tầng 5-7 chứa máy tính (Subclass: Computer).
++ Hệ thống tài khoản: Admin và User, Admin và User có chức năng khác nhau.
++ Các tệp dữ liệu:
+    account.txt: Danh sách tài khoản.
+    books.txt: Danh sách sách.
+    computers.txt: Danh sách máy tính.
+    booksCopy.txt: Tệp sao lưu/lưu trữ dữ liệu.
+
+2. Các chức năng
++ Xem danh sách tất cả sách, tài khoản và thông tin mượn trả.
++ Mượn và trả sách.
++ Thêm sách mới.
++ Thêm tài khoản mới và hiển thị thông tin cá nhân của tài khoản.
++ Báo cáo sự cố về vật phẩm và di chuyển vị trí vật phẩm.
++ Tìm kiếm sách theo tiêu đề hoặc tác giả.
++ Đọc và ghi dữ liệu vào tệp tin.
+
+3. Chi tiết
++ Class LibraryItem: Gồm các thuộc tính như level và zone.
++ Class Book (Kế thừa từ LibraryItem): Gồm các thuộc tính: title, author, quantity, page.
++ Class Computer (Kế thừa từ LibraryItem): Gồm các thuộc tính: specs, available.
++ Class Account: Gồm các thuộc tính: index, email, password, student_id, student_name, role.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Overview
++Structure: The library has 7 levels and 5 zones (A to E) used to store various items (Base Class: LibraryItem).
++Categorization: Levels 1-5 contain books (Subclass: Book), while levels 5-7 contain computers (Subclass: Computer).
++Account System: Supports Admin and User roles.
++Permissions: Admin and User have different roles and features.
++Data Files: account.txt (Account List), books.txt (Book List), computers.txt (Computer List), and booksCopy.txt (Backup/Data storage), 
+borrowedBooks.txt(Inforamtion of student and borrowed books).
+
+2. Features
++View all books, accounts, and borrowing information.
++Borrow and return books.
++Add new books and accounts.
++Display account profiles.
++Report item issues and move items between locations.
++Search for books by title or author.
++Read and write data to files.
+
+3. Details
++LibraryItem Class: Includes attributes such as level and zone.
++Book Class: Inherits from LibraryItem with additional attributes: title, author, quantity, and pages.
++Computer Class: Includes attributes: specs and availability.
++ccount Class: Includes attributes: index, email, password, student_id, student_name, and role.
+
+
+ 
