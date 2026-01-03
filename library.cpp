@@ -321,13 +321,18 @@ int main() {
 					}
 
 					case 12:{
+						Profile(lib);
+						break;
+					}
+
+					case 13:{
 						Write(lib, true, false, true, true, true);
 						cout << "===== Welcome to Ta Quang Buu Library =====\n";
 						status = false;
 						break;
 					}
 
-					case 13: {
+					case 14: {
 						Write(lib, true, false, true, true, true);
 						cout << "Exiting program...\n";
 						status = false;
@@ -640,7 +645,7 @@ void CountBooks(Library &lib) {
 void View(Library &lib, const string choice) {
 	if (choice == "books") {	
 		cout << "Here are the book titles\' list\n";
-		cout << "===================\n";
+		cout << "============================================\n";
         int bookIndex = 0;
 		for (auto i : lib.bookHolder) {
 			cout << "\"" << i.second.getTitle() << "\" by " << i.second.getAuthor()
@@ -660,25 +665,26 @@ void View(Library &lib, const string choice) {
                     getline(cin, selection);
                 }
                 if (selection == "1") {
+					cout << "==================================================\n";
                     bookIndex = 0;
                 }else {
+					cout << "==================================================\n";
                     break;
                 }
                 
             }
 		}
-		cout << "==================\n";
 	}
 	else if (choice == "computers") {
 		cout << "Here are the computer(s) available in the library:\n";
-		cout << "===================\n";
+		cout << "==================================================\n";
 		for (auto i : lib.computerHolder) {
 			if (i.second.isAvailable()) {
 				cout << "Computer ID: " << i.first << "\n - Specs: " << i.second.getSpecs()
 				<< "\n - Location: Level " << i.second.getLevel() << ", Zone " << i.second.getZone() << "\n";
 			}
 		}
-		cout << "==================\n";
+		cout << "==================================================\n";
 	}
 }
 
@@ -829,11 +835,14 @@ void Add(Library &lib) {
 
 void viewBorrowedUsers(Library &lib) {
 	string bookID;
+	int borrowedIndex = 0;
 	idInputChecker(lib.bookHolder, bookID);
 	if (lib.bookHolder[bookID].customerList.empty()) {
 		cout << "There are no customer whom borrowed this book!\n";
 	}
 	else {
+		cout << "Here are the accounts\' list\n";
+		cout << "==================================================\n";
 		cout << "They are:\n";
 		for (int i = 0; i < (int) lib.bookHolder[bookID].customerList.size(); i++) {
 			cout << "- Name: \"" << lib.bookHolder[bookID].customerList[i].name 
@@ -844,6 +853,29 @@ void viewBorrowedUsers(Library &lib) {
 				<< " day(s))\n" << "Sent email to " << lib.bookHolder[bookID].customerList[i].customerMail << "\n";
 			}
 			else cout << "\n";
+			borrowedIndex++;
+            if (borrowedIndex == 10) {
+                cout << "Do you want to show 10 next borrower\n";
+                cout << "1.Yes\n";
+                cout << "2.No\n";
+                string selection;
+                getline(cin, selection);
+                while(selection != "1" && selection != "2") {
+                    cout << "Invalid\n";
+                    cout << "Do you want to show 10 next borrower\n";
+                    cout << "1.Yes\n";
+                    cout << "2.No\n";
+                    getline(cin, selection);
+                }
+                if (selection == "1") {
+					cout << "==================================================\n";
+                    borrowedIndex = 0;
+                }else {
+					cout << "==================================================\n";
+                    break;
+                }
+                
+            }
 		}
 	}
 }
@@ -1164,8 +1196,33 @@ void CreateAcc(vector<Account> &Acc) {
 }
 
 void DisplayAcc(vector<Account> &Acc) {
+	int accIndex = 0;
+	cout << "Here are the accounts\' list\n";
+	cout << "==================================================\n";
 	for(int i = 0; i < (int) Acc.size(); i++) {
 		cout << Acc[i].getIndex() << "|" << Acc[i].getMail() << "|" << Acc[i].getPass() <<"|"<< Acc[i].getStudentID() << "|" << Acc[i].getUser() << "|" << Acc[i].getRole() << "|\n";
+		accIndex++;
+		if( accIndex == 10){
+			cout << "Do you want to show 10 next accounts\n";
+                cout << "1.Yes\n";
+                cout << "2.No\n";
+                string selection;
+                getline(cin, selection);
+                while(selection != "1" && selection != "2") {
+                    cout << "Invalid\n";
+                    cout << "Do you want to show 10 next accounts\n";
+                    cout << "1.Yes\n";
+                    cout << "2.No\n";
+                    getline(cin, selection);
+                }
+                if (selection == "1") {
+					cout << "==================================================\n";
+                    accIndex = 0;
+                }else {
+					cout << "==================================================\n";
+                    break;
+                }
+		}
 	}
 }
 
@@ -1337,8 +1394,9 @@ void adminMenu() {
 	cout << "|9. Add item(s)                     |\n"; // Done
 	cout << "|10. Move item to another place     |\n"; // Done
 	cout << "|11. Create an account              |\n"; // Done
-	cout << "|12. Return to sign in page         |\n"; // Done
-	cout << "|13. Exit                           |\n"; // Done
+	cout << "|12. Profile                        |\n"; // Done
+	cout << "|13. Return to sign in page         |\n"; // Done
+	cout << "|14. Exit                           |\n"; // Done
 	cout << "=====================================\n";
 }
 
@@ -1352,7 +1410,7 @@ void userMenu() {
 	cout << "|5. Borrow book (s)                 |\n"; // Done
 	cout << "|6. Return book (s)                 |\n"; // Done
 	cout << "|7. Rent computer                   |\n"; // Done
-    cout << "|8. Profile                         |\n"; // Undone
+    cout << "|8. Profile                         |\n"; // Done
 	cout << "|9. Return to sign in page          |\n"; // Done
 	cout << "|10. Exit                           |\n"; // Done
 	cout << "=====================================\n";
@@ -1379,10 +1437,10 @@ string getIntInput(string str) {
 }
 
 void Profile(Library &lib) {
-	cout << "\n======== Your Profile ========\n";
+	cout << "\n================ Your Profile ================\n";
 	cout << "|Username: " << lib.Acc.at(lib.currentAcc).getUser() << "\n";
 	cout << "|Email: " << lib.Acc.at(lib.currentAcc).getMail() << "\n";
 	cout << "|Student ID: " << lib.Acc.at(lib.currentAcc).getStudentID() << "\n";
 	cout << "|Role: " << lib.Acc.at(lib.currentAcc).getRole() << "\n";
-	cout << "========================\n";
+	cout << "================================================\n";
 }
