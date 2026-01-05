@@ -237,7 +237,9 @@ int main() {
 	ReadFile(lib);
 
 	// Login interface
-	cout << "===== Welcome to Ta Quang Buu Library =====\n";
+	cout << "===========================================\n";
+	cout << "|     Welcome to Ta Quang Buu Library     |\n";
+	cout << "===========================================\n";
 	while(open){
 		do {
 			cout << "Mail: "; 
@@ -245,7 +247,7 @@ int main() {
 			cout << "Password: "; 
 			getline(cin, password);
 			if(CheckPass(lib.Acc, mail, password)) {
-				cout << "Successfully!\n";
+				cout << "Login in Successfully!\n";
 				break;
 			}
 			else{
