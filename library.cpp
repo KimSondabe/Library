@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <limits>
 
 using namespace std;
 
@@ -41,13 +40,7 @@ class LibraryItems {
 		string getZone() {return zone;}
 		/* ======== Getters ========*/
 
-		/* ======== Setters ========*/
-		void Move(string level, string zone) {
-			this->zone = zone;
-			this->level = level;
-			cout << "Moved successfully!\n";
-		}
-		/* ======== Setters ========*/
+		void Move();
 };
 
 class Books : public LibraryItems {
@@ -170,7 +163,7 @@ typedef struct {
 // File working functions
 void ReadFile(Library &lib); // Read data from file
 void Write(Library &lib,bool writeToBooks, bool writeToCopy, bool writeToBorrowed, bool writeToAccounts, bool writeToComputers); // Write data to file
-void View(Library &lib, const string choice); // View book(s)
+void View(Library &lib, const string choice); // View items
 
 // Book Features Functions
 void Find(Library &lib, const string title, const string author, const string choice); // Find book by title/author
@@ -539,41 +532,13 @@ void MoveItem(Library &lib) {
 	if (itemType == "1") {	
 		string bookID, level, zone;
 		idInputChecker(lib.bookHolder, bookID);
-		cout << "Current location - Level: " << lib.bookHolder[bookID].getLevel()
-		<< ", Zone: " << lib.bookHolder[bookID].getZone() << "\n";
-		while(true) {
-			level = getIntInput("Enter Level (1-5): ");
-			if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
-			cout << "Invalid input, please try again\n";
-		}
-
-		while(true) {
-			cout << "Enter Zone (A-E): ";
-			getline(cin, zone);
-			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-			cout << "Invalid input, please try again.\n";
-		}
-		lib.bookHolder[bookID].Move(level, zone);
+		lib.bookHolder[bookID].Move();
 	}
 
 	else if (itemType == "2") {
 		string computerID, level, zone;
 		idInputChecker(lib.computerHolder, computerID);
-		cout << "Current location - Level: " << lib.computerHolder[computerID].getLevel()
-		<< ", Zone: " << lib.computerHolder[computerID].getZone() << "\n";
-		while(true) {
-			level = getIntInput("Enter Level (5-7): ");
-			if ((stoi(level) >= 5) && (stoi(level) <= 7)) break;
-			cout << "Invalid input, please try again\n";
-		}
-
-		while(true) {
-			cout << "Enter Zone (A-E): ";
-			getline(cin, zone);
-			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-			cout << "Invalid input, please try again.\n";
-		}
-		lib.computerHolder[computerID].Move(level, zone);
+		lib.computerHolder[computerID].Move();
 	}
 }
 
@@ -660,23 +625,15 @@ void View(Library &lib, const string choice) {
 			<< " with " << i.second.getQuantity() << " books.\n";
             bookIndex++;
             if (bookIndex == 10) {
-                cout << "Do you want to show 10 next book\n";
-                cout << "1.Yes\n";
-                cout << "2.No\n";
-                string selection;
-                getline(cin, selection);
+				string selection = getIntInput("Do you want to show 10 next books\n 1.Yes\n 2.No\n");
                 while(selection != "1" && selection != "2") {
                     cout << "Invalid\n";
-                    cout << "Do you want to show 10 next book\n";
-                    cout << "1.Yes\n";
-                    cout << "2.No\n";
-                    getline(cin, selection);
-                }
-                if (selection == "1") {
-					cout << "==================================================\n";
+				}
+				cout << "==================================================\n";
+				if (selection == "1") {
                     bookIndex = 0;
-                }else {
-					cout << "==================================================\n";
+                }
+				else {
                     break;
                 }
                 
@@ -686,10 +643,26 @@ void View(Library &lib, const string choice) {
 	else if (choice == "computers") {
 		cout << "Here are the computer(s) available in the library:\n";
 		cout << "==================================================\n";
+		int comIndex = 0;
 		for (auto i : lib.computerHolder) {
 			if (i.second.isAvailable()) {
 				cout << "Computer ID: " << i.first << "\n - Specs: " << i.second.getSpecs()
 				<< "\n - Location: Level " << i.second.getLevel() << ", Zone " << i.second.getZone() << "\n";
+				comIndex++;
+				if (comIndex == 10) {
+					string selection = getIntInput("Do you want to show 10 next computers\n 1.Yes\n 2.No\n");
+					while(selection != "1" && selection != "2") {
+						cout << "Invalid\n";
+					}
+					if (selection == "1") {
+						cout << "==================================================\n";
+						comIndex = 0;
+					}
+					else {
+						cout << "==================================================\n";
+						break;
+					}
+            	}
 			}
 		}
 		cout << "==================================================\n";
@@ -862,28 +835,19 @@ void viewBorrowedUsers(Library &lib) {
 			}
 			else cout << "\n";
 			borrowedIndex++;
-            if (borrowedIndex == 10) {
-                cout << "Do you want to show 10 next borrower\n";
-                cout << "1.Yes\n";
-                cout << "2.No\n";
-                string selection;
-                getline(cin, selection);
-                while(selection != "1" && selection != "2") {
-                    cout << "Invalid\n";
-                    cout << "Do you want to show 10 next borrower\n";
-                    cout << "1.Yes\n";
-                    cout << "2.No\n";
-                    getline(cin, selection);
-                }
-                if (selection == "1") {
-					cout << "==================================================\n";
-                    borrowedIndex = 0;
-                }else {
-					cout << "==================================================\n";
-                    break;
-                }
-                
-            }
+			if (borrowedIndex == 10) {
+				string selection = getIntInput("Do you want to show 10 next accounts\n 1.Yes\n 2.No\n");
+				while(selection != "1" && selection != "2") {
+					cout << "Invalid\n";
+				}
+				cout << "==================================================\n";
+				if (selection == "1") {
+					borrowedIndex = 0;
+				}
+				else {
+					break;
+				}       
+			}         
 		}
 	}
 }
@@ -1060,16 +1024,16 @@ void rentComputer(Library &lib) {
 }
 string idCounter(string prevID) {
 	int idBooklength = 4;
-    if (prevID.size() != idBooklength) return "";
+    if ((int) prevID.size() != idBooklength) return "";
     for (char c : prevID) { 
         if (!isdigit(c)) return "";
 	}
 	string upComingID = to_string((stoi(prevID) + 1));
-	if (upComingID.length() > idBooklength) {
+	if ((int) upComingID.length() > idBooklength) {
 		cout << "Out of storage!\n";
 		return "";
 	}
-	while(upComingID.length() < idBooklength) {
+	while((int) upComingID.length() < idBooklength) {
 		upComingID = "0" + upComingID;
 	}
     return upComingID;
@@ -1083,7 +1047,7 @@ void idInputChecker(map<string, Books> &bookHolder, string &bookID) {
 		for (char i : bookID) {
 			if (!isdigit(i)) bookID += "filler";
 		}
-		if (bookID.length() != idBooklength) {
+		if ((int) bookID.length() != idBooklength) {
 			cout << "Invalid input, please try again.\n";
 			continue;
 		}
@@ -1106,7 +1070,7 @@ void idInputChecker(map<string, Computers> &computerHolder, string &computerID) 
 		for (char i : computerID) {
 			if (!isdigit(i)) computerID += "filler";
 		}
-		if (computerID.length() != idComputerlength) {
+		if ((int) computerID.length() != idComputerlength) {
 			cout << "Invalid input, please try again.\n";
 			continue;
 		}
@@ -1219,27 +1183,19 @@ void DisplayAcc(vector<Account> &Acc) {
 	for(int i = 0; i < (int) Acc.size(); i++) {
 		cout << Acc[i].getIndex() << "|" << Acc[i].getMail() << "|" << Acc[i].getPass() <<"|"<< Acc[i].getStudentID() << "|" << Acc[i].getUser() << "|" << Acc[i].getRole() << "|\n";
 		accIndex++;
-		if( accIndex == 10){
-			cout << "Do you want to show 10 next accounts\n";
-                cout << "1.Yes\n";
-                cout << "2.No\n";
-                string selection;
-                getline(cin, selection);
-                while(selection != "1" && selection != "2") {
-                    cout << "Invalid\n";
-                    cout << "Do you want to show 10 next accounts\n";
-                    cout << "1.Yes\n";
-                    cout << "2.No\n";
-                    getline(cin, selection);
-                }
-                if (selection == "1") {
-					cout << "==================================================\n";
-                    accIndex = 0;
-                }else {
-					cout << "==================================================\n";
-                    break;
-                }
-		}
+		if (accIndex == 10) {
+				string selection = getIntInput("Do you want to show 10 next accounts\n 1.Yes\n 2.No\n");
+				while(selection != "1" && selection != "2") {
+					cout << "Invalid\n";
+				}
+				cout << "==================================================\n";
+				if (selection == "1") {
+					accIndex = 0;
+				}
+				else {
+					break;
+				}       
+			}         
 	}
 }
 
@@ -1252,7 +1208,7 @@ void Profile(Library &lib) {
 	cout << "================================================\n";
 }
 
-//General Function 
+// String Function 
 string lowerCase(string str) {
 	string result = "";
 	for (char i : str) {
@@ -1461,4 +1417,26 @@ string getIntInput(string str) {
 		}
 	} while (!isNumber);
     return input;
+}
+
+// Class functions
+void LibraryItems::Move() {
+	cout << "Current location - Level: " << level
+		<< ", Zone: " << zone << "\n";
+		while(true) {
+			level = getIntInput("Enter Level (1-5): ");
+			if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
+			cout << "Invalid input, please try again\n";
+		}
+
+		while(true) {
+			cout << "Enter Zone (A-E): ";
+			getline(cin, zone);
+			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
+			cout << "Invalid input, please try again.\n";
+		}
+		this->level = level;
+		this->zone = zone;
+		cout << "===== Moved successfully! New location - Level: " << level
+		<< ", Zone: " << zone << " =====\n";
 }

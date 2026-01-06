@@ -1,6 +1,6 @@
 1|Son.VK2414860@sis.hust.edu.vn|Son24hust|202414860|Vu Kim Son|Admin|
-2|Hung.NT2514819@sis.hust.edu.vn|Hung25hust|202514819|Nguyen Thanh Hung|Admin|
-3|Long.VN2514865@sis.hust.edu.vn|Long25hust|202514865|Vu Ngoc Long|User|
+2|Hung.NT2514819@sis.hust.edu.vn|Hung25hust|202514819|Nguyen Tat Hung|Admin|
+3|Long.VN2514865@sis.hust.edu.vn|Long25hust|202514865|Vu Nhat Long|User|
 4|Anh.PT2415902@sis.hust.edu.vn|Anh24hust|202415902|Phan Tuyet Anh|User|
 5|Minh.DQ2312450@sis.hust.edu.vn|Minh23hust|202312450|Do Quang Minh|User|
 6|Lan.HT2416821@sis.hust.edu.vn|Lan24hust|202416821|Hoang Thi Lan|User|

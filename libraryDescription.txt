@@ -15,9 +15,10 @@
     booksCopy.txt: Tệp sao lưu/lưu trữ dữ liệu.
 
 2. Các chức năng
-+ Xem danh sách tất cả sách, tài khoản và thông tin mượn trả.
++ Xem danh sách tất cả sách, máy tính, tài khoản và thông tin mượn trả.
 + Mượn và trả sách.
-+ Thêm sách mới.
++ Thuê máy tính.
++ Thêm sách/máy tính mới.
 + Thêm tài khoản mới và hiển thị thông tin cá nhân của tài khoản.
 + Báo cáo sự cố về vật phẩm và di chuyển vị trí vật phẩm.
 + Tìm kiếm sách theo tiêu đề hoặc tác giả.
@@ -32,27 +33,28 @@
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 1. Overview
-+Structure: The library has 7 levels and 5 zones (A to E) used to store various items (Base Class: LibraryItem).
-+Categorization: Levels 1-5 contain books (Subclass: Book), while levels 5-7 contain computers (Subclass: Computer).
-+Account System: Supports Admin and User roles.
-+Permissions: Admin and User have different roles and features.
-+Data Files: account.txt (Account List), books.txt (Book List), computers.txt (Computer List), and booksCopy.txt (Backup/Data storage), 
++ Structure: The library has 7 levels and 5 zones (A to E) used to store various items (Base Class: LibraryItem).
++ Categorization: Levels 1-5 contain books (Subclass: Book), while levels 5-7 contain computers (Subclass: Computer).
++ Account System: Supports Admin and User roles.
++ Permissions: Admin and User have different roles and features.
++ Data Files: account.txt (Account List), books.txt (Book List), computers.txt (Computer List), and booksCopy.txt (Backup/Data storage), 
 borrowedBooks.txt(Inforamtion of student and borrowed books).
 
 2. Features
-+View all books, accounts, and borrowing information.
-+Borrow and return books.
-+Add new books and accounts.
-+Display account profiles.
-+Report item issues and move items between locations.
-+Search for books by title or author.
-+Read and write data to files.
++ View all books, computers, accounts, and borrowing information.
++ Borrow and return books.
++ Rent computers.
++ Add new books/computers and accounts.
++ Display account profiles.
++ Report item issues and move items between locations.
++ Search for books by title or author.
++ Read and write data to files.
 
 3. Details
-+LibraryItem Class: Includes attributes such as level and zone.
-+Book Class: Inherits from LibraryItem with additional attributes: title, author, quantity, and pages.
-+Computer Class: Includes attributes: specs and availability.
-+ccount Class: Includes attributes: index, email, password, student_id, student_name, and role.
++ LibraryItem Class: Includes attributes such as level and zone.
++ Book Class: Inherits from LibraryItem with additional attributes: title, author, quantity, and pages.
++ Computer Class: Includes attributes: specs and availability.
++ Account Class: Includes attributes: index, email, password, student_id, student_name, and role.
 
 
  
