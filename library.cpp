@@ -40,7 +40,7 @@ class LibraryItems {
 		string getZone() {return zone;}
 		/* ======== Getters ========*/
 
-		void Move();
+		void Move(string itemType);
 };
 
 class Books : public LibraryItems {
@@ -540,13 +540,13 @@ void MoveItem(Library &lib) {
 	if (itemType == "1") {	
 		string bookID, level, zone;
 		idInputChecker(lib.bookHolder, bookID);
-		lib.bookHolder[bookID].Move();
+		lib.bookHolder[bookID].Move("book");
 	}
 
 	else if (itemType == "2") {
 		string computerID, level, zone;
 		idInputChecker(lib.computerHolder, computerID);
-		lib.computerHolder[computerID].Move();
+		lib.computerHolder[computerID].Move("computer");
 	}
 }
 
@@ -1445,23 +1445,47 @@ string getIntInput(string str) {
 }
 
 // Class functions
-void LibraryItems::Move() {
-	cout << "Current location - Level: " << level
-		<< ", Zone: " << zone << "\n";
-		while(true) {
-			level = getIntInput("Enter Level (1-5): ");
-			if ((stoi(level) >= 1) && (stoi(level) <= 5)) break;
-			cout << "Invalid input, please try again\n";
-		}
+void LibraryItems::Move( string itemType) {
+    cout << "Current location - Level: " << level
+         << ", Zone: " << zone << "\n";
 
-		while(true) {
-			cout << "Enter Zone (A-E): ";
-			getline(cin, zone);
-			if ((zone.length() == 1) && (zone[0] >= 'A') && (zone[0] <= 'E')) break;
-			cout << "Invalid input, please try again.\n";
-		}
-		this->level = level;
-		this->zone = zone;
-		cout << "===== Moved successfully! New location - Level: " << level
-		<< ", Zone: " << zone << " =====\n";
+    string newLevel;
+    if (itemType == "book") {
+        while(true) {
+            newLevel = getIntInput("Enter new Level for BOOK (1-5): ");
+            int lvl = stoi(newLevel);
+            if (lvl >= 1 && lvl <= 5) break;
+            cout << "Invalid: Books can only be placed on levels 1-5. Please try again.\n";
+        }
+    }
+    else if (itemType == "computer") {
+        while(true) {
+            newLevel = getIntInput("Enter new Level for COMPUTER (5-7): ");
+            int lvl = stoi(newLevel);
+            if (lvl >= 5 && lvl <= 7) break;
+            cout << "Invalid: Computers can only be placed on levels 5-7. Please try again.\n";
+        }
+    }
+    else {
+        cout << "Error: Unknown item type!\n";
+        return;
+    }
+
+    string newZone;
+    while(true) {
+        cout << "Enter new Zone (A-E): ";
+        getline(cin, newZone);
+        if (newZone.length() == 1 && newZone[0] >= 'A' && newZone[0] <= 'E') {
+            newZone = toupper(newZone[0]);  
+            break;
+        }
+        cout << "Invalid zone. Please enter a single letter from A to E.\n";
+    }
+
+    
+    this->level = newLevel;
+    this->zone = newZone;
+
+    cout << "===== Moved successfully! New location - Level " << newLevel
+         << ", Zone " << newZone << " =====\n";
 }
