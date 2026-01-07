@@ -94,8 +94,16 @@ class Computers : public LibraryItems {
 
 		/* ======== Getters ========*/
 		int rentMoney(int hours) {
-			return (specs == "HIGH") ? 12000 * hours : (specs == "MID") ? 10000 * hours : 7000 * hours;
-		}
+	        if (specs == "HIGH") {
+		        return 12000 * hours;
+	        } 
+	        else if (specs == "MID") {
+		        return 10000 * hours;
+	        } 
+	        else {
+		        return 7000 * hours;
+	        }
+        }
 		string getSpecs() {return specs;}
 		bool isAvailable() {return available;}
 		/* ======== Getters ========*/
@@ -899,54 +907,71 @@ void Borrow(Library &lib) {
 }
 
 void Return(Library &lib) {
-	string bookID, buffer;
+	string bookID;
 	idInputChecker(lib.bookHolder, bookID);
-	vector<customerInfo> customerlist;
-	int originalBorrowedHolderSize = (int) lib.borrowedHolder.size();
 
-	// Find the book in borrowedHolder
-	for (int i = 0; i < originalBorrowedHolderSize; i++) {
-		if (lib.borrowedHolder[i].bookID == bookID) {
-			customerInfo returnCustomer;
-			returnCustomer.name = lib.Acc.at(lib.currentAcc).getUser();
-			returnCustomer.customerID = lib.Acc.at(lib.currentAcc).getStudentID();
+	string userName = lib.Acc.at(lib.currentAcc).getUser();
+	string userID   = lib.Acc.at(lib.currentAcc).getStudentID();
 
-			// Check if customer info matches
-			if (lib.borrowedHolder[i].info.name != returnCustomer.name || lib.borrowedHolder[i].info.customerID != returnCustomer.customerID) {
-				cout << returnCustomer.name << " - " << returnCustomer.customerID << "\n";
-				cout << "No record found for this customer!\n";
-				return;
-			}
-			// Store borrowed info then remove from borrowedHolder
-			BorrowedBookInfo borrowed = lib.borrowedHolder[i];
-			lib.borrowedHolder.erase(lib.borrowedHolder.begin() + i);
-			// Increase book quantity in bookHolder and update customer list
-			// Calculate late days
-			int lateDays = 0;
-			lateDays = dayCounter(borrowed.info.borrowDay, lib.today) - lib.bookHolder[bookID].getBorrowDate();
-			if (lateDays > 0) {
-				cout << "You are late by " << lateDays << " day(s). Please pay fine of " 
-				<< lateDays * lib.bookHolder[bookID].getPages() * stoi(borrowed.borrowQuantity) 
-				<< " VND.\n";
-				cout << "Press Enter to confirm payment...";
-				cin.get();
-			}
-			else {
-				cout << "Thank you for returning on time!\n";
-			}
-				lib.bookHolder[bookID].changeQuantity(stoi(borrowed.borrowQuantity));
-				int originalCustomerListSize = (int) lib.bookHolder[bookID].customerList.size();
-				for (int k = 0; k < originalCustomerListSize; k++) {
-					if (lib.bookHolder[bookID].customerList[k].name == returnCustomer.name && lib.bookHolder[bookID].customerList[k].customerID == returnCustomer.customerID) {
-						lib.bookHolder[bookID].customerList.erase(lib.bookHolder[bookID].customerList.begin() + k);
-						break;
-					}
-				}
-				cout << "===== Book returned successfully! =====\n";
-				return;
+	bool found = false;
+
+	for (int i = 0; i < (int)lib.borrowedHolder.size(); i++) {
+        // kiểm tra đúng sách chưa
+		if (lib.borrowedHolder[i].bookID != bookID) {
+            continue;
+        }
+			// kiểm tra đúng người mượn chưa
+		if (lib.borrowedHolder[i].info.name != userName || lib.borrowedHolder[i].info.customerID != userID) {
+            continue;
+        }
+
+		found = true;
+
+		BorrowedBookInfo borrowed = lib.borrowedHolder[i];
+
+		//  Tính số ngày trễ
+		int lateDays = dayCounter(borrowed.info.borrowDay, lib.today)
+		             - lib.bookHolder[bookID].getBorrowDate();
+
+		if (lateDays > 0) {
+			int fine = lateDays
+			         * lib.bookHolder[bookID].getPages()
+			         * stoi(borrowed.borrowQuantity);
+
+			cout << "You are late by " << lateDays << " day(s).\n";
+			cout << "Fine: " << fine << " VND\n";
+			cout << "Press Enter to confirm payment...";
+			cin.get();
+		} else {
+			cout << "Thank you for returning on time!\n";
 		}
+
+		// cập nhật số lượng sách
+		lib.bookHolder[bookID].changeQuantity(stoi(borrowed.borrowQuantity));
+
+		// xóa khỏi customerList
+		auto &customers = lib.bookHolder[bookID].customerList;
+		for (int k = 0; k < (int)customers.size(); k++) {
+			if (customers[k].name == userName &&
+			    customers[k].customerID == userID) {
+				customers.erase(customers.begin() + k);
+				break;
+			}
+		}
+
+		// xóa khỏi borrowedHolder
+		lib.borrowedHolder.erase(lib.borrowedHolder.begin() + i);
+
+		cout << "===== Book returned successfully! =====\n";
+		return;
+	}
+
+	// không tìm thấy bản ghi
+	if (!found) {
+		cout << "No record found for this customer!\n";
 	}
 }
+
 
 void FindBooks(Library &lib) {
 	string choice, inputString;

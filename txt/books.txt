@@ -1,4 +1,4 @@
-0001|Algorithms Unlocked|Thomas Cormen|42|240|3|A|
+0001|Algorithms Unlocked|Thomas Cormen|45|240|4|A|
 0002|Clean Code|Robert Martin|125|464|4|B|
 0003|Introduction to Psychology|Sarah Gilbert|12|650|1|C|
 0004|Modern Architecture|Hans Zimmer|5|320|5|A|
